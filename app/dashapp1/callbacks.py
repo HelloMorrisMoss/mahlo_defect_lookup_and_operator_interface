@@ -9,10 +9,10 @@ import pandas_datareader as pdr
 
 def register_callbacks(dashapp):
     @dashapp.callback(
-        Output('my-graph', 'figure'),
+        Output('my-table', 'figure'),
         Input('my-dropdown', 'value'),
         State('user-store', 'data'))
-    def update_graph(selected_dropdown_value, data):
+    def update_table(selected_dropdown_value, data):
         df = pdr.get_data_yahoo(selected_dropdown_value, start=dt(2017, 1, 1), end=dt.now())
         return {
             'data': [{
