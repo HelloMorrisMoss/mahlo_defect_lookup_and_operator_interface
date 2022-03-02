@@ -1,10 +1,11 @@
 import pandas as pd
 import dash_table
+import requests
+from untracked_config import defects_list_address
 
 
-df = pd.read_csv(r'app/postgres_public_lamiefect_removal_records.csv')
-
-df.set_index('id', inplace=True, drop=False)
+response = requests.get(defects_list_address)
+df = pd.DataFrame.from_dict(response.json()).T
 
 datatable = dash_table.DataTable(
         id='datatable-interactivity',
@@ -24,9 +25,9 @@ datatable = dash_table.DataTable(
         selected_rows=[],           # indices of rows that user selects
         page_action="native",       # all data is passed to the table up-front or not ('none')
         page_current=0,             # page number that user is on
-        page_size=6,                # number of rows visible per page
+        page_size=25,                # number of rows visible per page
         style_cell={                # ensure adequate header width when text is shorter than cell's text
-            'minWidth': 95, 'maxWidth': 200, 'width': 95
+            'minWidth': 95, 'width': 95
         },
         style_cell_conditional=[    # align text columns to left. By default they are aligned to right
             {
