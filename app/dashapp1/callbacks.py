@@ -15,16 +15,30 @@ lg = logging.getLogger()
 
 def register_callbacks(dashapp):
     @dashapp.callback(
-        Output('defect_table', 'defect_data'),
+        Output('defect_table', 'data'),
+        # Output('defect_table', 'columns'),
         Input('defect_start_ts_range_picker', 'start_date'),
         Input('defect_start_ts_range_picker', 'end_date'),
-        # State('user-store', 'data')
+        State('user-store', 'user_data'),
         )
-    def update_table(start_date, end_date):
+    def update_table(start_date, end_date, user_data):
         # '2022-02-27'
         # '2022-03-02T14:35:17.190967'
+        print(f'dates! {start_date=}, {end_date=}')
 
-        return get_defects().to_dict('records')
+        defects_data = get_defects(start_date, end_date)
+        # column_names = defects_data.columns
+        # columns = [
+        #     {"name": i, "id": i, "deletable": True, "selectable": True, "hideable": True}
+        #     for i in defects_data.columns
+        # ]
+        new_data = defects_data.to_dict('records')
+        print(f'new data {new_data}')
+        return new_data  #, columns
+
+    # @dashapp.callback(Input('defect_table', 'data'))
+    # def data_table_updated(data):
+    #     print('the data table data has been updated')
 
     # @dashapp.callback(
     #     Output('user-store', 'data'),

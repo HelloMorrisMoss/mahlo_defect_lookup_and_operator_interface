@@ -1,9 +1,7 @@
 from datetime import datetime as dt
-import datetime
 from dash import dcc
 
-
-today = dt.today()
+from app.dashapp1.default_dates import today, yesterday
 
 date_picker = dcc.DatePickerRange(
     id='defect_start_ts_range_picker',  # ID to be used for callback
@@ -19,7 +17,7 @@ date_picker = dcc.DatePickerRange(
     min_date_allowed=dt(2021, 11, 1),  # minimum date allowed on the DatePickerRange component
     max_date_allowed=today,  # maximum date allowed on the DatePickerRange component
     initial_visible_month=today,  # the month initially presented when the user opens the calendar
-    start_date=today - datetime.timedelta(days=1),
+    start_date=yesterday,
     end_date=today,
     display_format='MMM Do, YY',  # how selected dates are displayed in the DatePickerRange component.
     month_format='MMMM, YYYY',  # how calendar headers are displayed when the calendar is opened.
