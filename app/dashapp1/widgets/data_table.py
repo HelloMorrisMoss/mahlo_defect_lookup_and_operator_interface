@@ -7,6 +7,7 @@ from untracked_config import defects_list_address
 response = requests.get(defects_list_address)
 df = pd.DataFrame.from_dict(response.json()).T
 
+
 datatable = dash_table.DataTable(
         id='datatable-interactivity',
         columns=[
