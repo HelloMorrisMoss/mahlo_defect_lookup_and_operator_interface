@@ -6,7 +6,7 @@ from dash import dcc
 today = dt.today()
 
 date_picker = dcc.DatePickerRange(
-    id='my-date-picker-range',  # ID to be used for callback
+    id='defect_start_ts_range_picker',  # ID to be used for callback
     calendar_orientation='horizontal',  # vertical or horizontal
     day_size=39,  # size of calendar image. Default is 39
     end_date_placeholder_text="Return",  # text that appears when no end date chosen
