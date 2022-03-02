@@ -1,9 +1,10 @@
 from dash import dash_table
 
 from app.connections import get_defects
+from app.dashapp1.default_dates import today, yesterday
 
 
-defects_data = get_defects()
+defects_data = get_defects(today, yesterday)
 
 datatable = dash_table.DataTable(
         id='defect_table',
