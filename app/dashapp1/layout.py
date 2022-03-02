@@ -6,25 +6,8 @@ import dash_table
 
 from app import data_table
 
-data_table
 table = data_table.datatable
 
-# table_header = [
-#     html.Thead(html.Tr([html.Th("First Name"), html.Th("Last Name")]))
-#     ]
-#
-# row1 = html.Tr([html.Td("Arthur"), html.Td("Dent")])
-# row2 = html.Tr([html.Td("Ford"), html.Td("Prefect")])
-# row3 = html.Tr([html.Td("Zaphod"), html.Td("Beeblebrox")])
-# row4 = html.Tr([html.Td("Trillian"), html.Td("Astra")])
-#
-# table_body = [html.Tbody([row1, row2, row3, row4])]
-# table = dbc.Table(table_header + table_body,
-#                   bordered=True,
-#                   dark=True,
-#                   hover=True,
-#                   responsive=True,
-#                   striped=True)
 
 layout = html.Div(id='main', children=[
     html.H1(id='username'),
@@ -34,7 +17,6 @@ layout = html.Div(id='main', children=[
         options=[{'label': a, 'value': b} for a, b in (('one', '1'), ('two', '2'))],
         value='1'
         ),
-    # dbc.Table(id='my-table'),
     table,
     dcc.Store(id='user-store'),
     ], style={'width': '500'})

@@ -2,21 +2,14 @@ import pandas as pd
 import dash_table
 
 
-df = pd.read_csv(r'app/internet_cleaned.csv')
-df = df[df['year'] == 2019]
+df = pd.read_csv(r'app/postgres_public_lamiefect_removal_records.csv')
 
-# Creating an ID column name gives us more interactive capabilities
-df['id'] = df['iso_alpha3']
 df.set_index('id', inplace=True, drop=False)
-print(df.columns)
-
 
 datatable = dash_table.DataTable(
         id='datatable-interactivity',
         columns=[
             {"name": i, "id": i, "deletable": True, "selectable": True, "hideable": True}
-            if i == "iso_alpha3" or i == "year" or i == "id"
-            else {"name": i, "id": i, "deletable": True, "selectable": True}
             for i in df.columns
         ],
         data=df.to_dict('records'),  # the contents of the table
@@ -33,7 +26,7 @@ datatable = dash_table.DataTable(
         page_current=0,             # page number that user is on
         page_size=6,                # number of rows visible per page
         style_cell={                # ensure adequate header width when text is shorter than cell's text
-            'minWidth': 95, 'maxWidth': 95, 'width': 95
+            'minWidth': 95, 'maxWidth': 200, 'width': 95
         },
         style_cell_conditional=[    # align text columns to left. By default they are aligned to right
             {
