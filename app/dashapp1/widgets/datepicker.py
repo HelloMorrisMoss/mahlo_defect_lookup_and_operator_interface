@@ -1,9 +1,7 @@
 from datetime import datetime as dt
-import datetime
 from dash import dcc
 
-
-today = dt.today()
+from app.dashapp1.default_dates import end_date, start_date, a_month
 
 date_picker = dcc.DatePickerRange(
     id='defect_start_ts_range_picker',  # ID to be used for callback
@@ -15,12 +13,12 @@ date_picker = dcc.DatePickerRange(
     reopen_calendar_on_clear=True,
     is_RTL=False,  # True or False for direction of calendar
     clearable=True,  # whether or not the user can clear the dropdown
-    number_of_months_shown=1,  # number of months shown when calendar is open
+    number_of_months_shown=2,  # number of months shown when calendar is open
     min_date_allowed=dt(2021, 11, 1),  # minimum date allowed on the DatePickerRange component
-    max_date_allowed=today,  # maximum date allowed on the DatePickerRange component
-    initial_visible_month=today,  # the month initially presented when the user opens the calendar
-    start_date=today - datetime.timedelta(days=1),
-    end_date=today,
+    max_date_allowed=end_date,  # maximum date allowed on the DatePickerRange component
+    initial_visible_month=end_date - a_month,  # the month initially presented when the user opens the calendar
+    start_date=start_date,
+    end_date=end_date,
     display_format='MMM Do, YY',  # how selected dates are displayed in the DatePickerRange component.
     month_format='MMMM, YYYY',  # how calendar headers are displayed when the calendar is opened.
     minimum_nights=2,  # minimum number of days between start and end date
