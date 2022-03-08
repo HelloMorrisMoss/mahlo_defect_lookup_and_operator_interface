@@ -1,16 +1,9 @@
-from datetime import datetime as dt
+import logging
 
 from dash.dependencies import Input
 from dash.dependencies import Output
-from dash.dependencies import State
-from flask_login import current_user
-import pandas_datareader as pdr
 
 from app.connections import get_defects
-
-import logging
-
-from app.dashapp1.widgets.data_table import get_table_params
 
 lg = logging.getLogger()
 
@@ -30,13 +23,12 @@ def register_callbacks(dashapp):
         print(f'dates! {start_date=}, {end_date=}')
 
         defects_data = get_defects(start_date, end_date)
-        column_names = defects_data.columns
+        # column_names = defects_data.columns
         columns = [
             {"name": i, "id": i, "deletable": True, "selectable": True, "hideable": True}
             for i in defects_data.columns
         ]
         new_data = defects_data.to_dict('records')
-        print(f'new data {new_data}')
         return new_data, columns
 
     # @dashapp.callback(Input('defect_table', 'data'))
