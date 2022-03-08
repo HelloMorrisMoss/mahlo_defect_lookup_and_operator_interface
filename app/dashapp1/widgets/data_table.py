@@ -1,10 +1,12 @@
 from dash import dash_table
 
 from app.connections import get_defects
-from app.dashapp1.default_dates import end_date, start_date
+from app.dashapp1.default_dates import get_start_end_dates
 
 
 def get_table_params(table_defects_data):
+    """Get the parameter dictionary for the data table using the data provided."""
+
     return dict(
         id='defect_table',
         columns=[
@@ -42,9 +44,12 @@ def get_table_params(table_defects_data):
 
 
 def get_datatable(param_dict):
+    """Get the datatable object using the provided parameter dictionary."""
+
     return dash_table.DataTable(**param_dict)
 
 
+start_date, end_date = get_start_end_dates()
 defects_data = get_defects(start_date, end_date)
 defect_table_params = get_table_params(defects_data)
 datatable = get_datatable(defect_table_params)
