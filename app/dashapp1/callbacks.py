@@ -18,10 +18,6 @@ def register_callbacks(dashapp):
         # State('user-store', 'data')
         )
     def update_table(start_date, end_date):
-        # '2022-02-27'
-        # '2022-03-02T14:35:17.190967'
-        print(f'dates! {start_date=}, {end_date=}')
-
         defects_data = get_defects(start_date, end_date)
         # column_names = defects_data.columns
         columns = [
