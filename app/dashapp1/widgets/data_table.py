@@ -52,5 +52,8 @@ def get_datatable(param_dict):
 
 start_date, end_date = get_start_end_dates()
 defects_data = get_defects(start_date, end_date)
-defect_table_params = get_table_params(defects_data)
-datatable = get_datatable(defect_table_params)
+if defects_data is not None:
+    defect_table_params = get_table_params(defects_data)
+    datatable = get_datatable(defect_table_params)
+else:
+    print('No defect data.')
