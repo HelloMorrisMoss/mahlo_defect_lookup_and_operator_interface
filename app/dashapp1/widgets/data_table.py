@@ -57,3 +57,4 @@ if defects_data is not None:
     datatable = get_datatable(defect_table_params)
 else:
     print('No defect data.')
+    datatable = dash_table.DataTable()
