@@ -7,14 +7,16 @@ import requests
 from untracked_config import defects_list_address
 
 
-def get_defects(start_date: datetime = None, end_date=None):
+def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
+    """Get the defect records within the date range from the database-service."""
+
     print(f'{start_date=}, {end_date=}')
     try:
         data = {
             'start_date': start_date.isoformat() if not isinstance(start_date, str) else start_date,
             'end_date': end_date.isoformat() if not isinstance(end_date, str) else end_date,
             }
-        response = requests.get(defects_list_address, params=data)
+        response = requests.get(defects_list_address, params=data, timeout=20)
         response_dict = response.json()
         defects_df = pd.DataFrame.from_dict(response_dict).T
         ts_columns = 'defect_start_ts', 'defect_end_ts', 'entry_created_ts', 'entry_modified_ts'
@@ -23,3 +25,4 @@ def get_defects(start_date: datetime = None, end_date=None):
         return defects_df
     except Exception:
         print(f'Error fetching defect data: {format_exc()}')
+        return pd.DataFrame.from_dict({'defect_data': ['failed to load']})
