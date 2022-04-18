@@ -8,7 +8,7 @@ A_MONTH = relativedelta(months=1)
 
 
 def get_start_end_dates():
-    """Get the default start end end dates for today."""
+    """Get the default start and end dates for today."""
 
     end_date = dt.today().date() + A_DAY
     start_date = end_date - A_DAY * 2
