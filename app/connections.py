@@ -18,11 +18,30 @@ def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.Da
             }
         response = requests.get(defects_list_address, params=data, timeout=20)
         response_dict = response.json()
-        defects_df = pd.DataFrame.from_dict(response_dict).T
-        ts_columns = 'defect_start_ts', 'defect_end_ts', 'entry_created_ts', 'entry_modified_ts'
-        for col in ts_columns:
-            defects_df[col] = pd.to_datetime(defects_df[col]).dt.strftime('%Y-%m-%d %H:%M')
+        defects_columns = response_dict['default_column_order']
+        defects_dict = response_dict['results_dict']
+        defects_df = pd.DataFrame.from_dict(defects_dict).T
+        defects_df = defects_df[defects_columns]
+        if not len(defects_df):
+            print('No records found')
+            defects_df = pd.DataFrame.from_dict({'defect_data': ['No Records Found.']})
+        else:
+            for idx, col in enumerate(defects_df):  # loop through all columns
+                if col.endswith('_ts') or col.endswith('_time'):
+                    defects_df[col] = pd.to_datetime(defects_df[col]).dt.tz_localize(None)  # excel can't do timezones
+                    defects_df[col] = defects_df[col].dt.round(
+                        '1s')  # don't need milliseconds here and columns wind up too wide with empty space
         return defects_df
     except Exception:
         print(f'Error fetching defect data: {format_exc()}')
         return pd.DataFrame.from_dict({'defect_data': ['failed to load']})
+
+
+if __name__ == '__main__':
+    import datetime as dt
+
+    a_day = dt.timedelta(days=1.0)
+    now = datetime.now()
+    yesterday = now - a_day
+    ddf = get_defects(start_date=yesterday, end_date=now)
+    print(ddf.head())
