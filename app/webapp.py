@@ -66,3 +66,8 @@ def register():
         return redirect(url_for('main.login'))
 
     return render_template('register.html', title='Register', form=form)
+
+# @server_bp.route('/dash_multipage/', methods=['GET', 'POST'])
+# def dash_multipage():
+#     print('rendering dash_multipage')
+#     return render_template('dash_multipage.html', title='Dash Multipage')
