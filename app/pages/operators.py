@@ -9,6 +9,6 @@ register_page(
 
 
 def layout():
-    from scratch_4 import get_operator_layout
+    from app.operators.scratch_4 import get_operator_layout
 
     return get_operator_layout()
