@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from flask import Flask
 from flask_login import login_required
 
-from app.operators.scratch_4 import register_operator_callbacks
+from app.operators.layout import register_operator_callbacks
 from config import BaseConfig
 from multipage_app import generate_dash_multipage_layout
 
@@ -19,7 +19,7 @@ def create_app():
     return server
 
 
-def register_dashapps(app):
+def register_dashapps(flask_app):
     # from app.dashapp1.layout import layout
     from app.dashapp1.callbacks import register_callbacks
 
@@ -28,7 +28,6 @@ def register_dashapps(app):
         "name": "viewport",
         "content": "width=device-width, initial-scale=1, shrink-to-fit=no"}
 
-    import dash_bootstrap_components as dbc
     # To use Font Awesome Icons
     FA621 = "https://use.fontawesome.com/releases/v6.2.1/css/all.css"
     APP_TITLE = "Nitto Lakewood Dash App"
@@ -41,12 +40,12 @@ def register_dashapps(app):
         ],
         use_pages=True,  # allows us to register pages
         pages_folder='pages',
-        server=app,
+        server=flask_app,
         meta_tags=[meta_viewport],
         url_base_pathname='/dashboard/',
     )
 
-    with app.app_context():
+    with flask_app.app_context():
         dashapp1.title = APP_TITLE
         dashapp1.layout = generate_dash_multipage_layout()
         register_callbacks(dashapp1)
