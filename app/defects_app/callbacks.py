@@ -33,7 +33,7 @@ def register_callbacks(dashapp):
         [Input("defect_table", "active_cell")]
         )
     def update_selected_row_color(active):
-        from app.dashapp1.widgets.data_table import style_data
+        from app.defects_app.widgets.data_table import style_data
         style = style_data.copy()
         if active:
             style.append(

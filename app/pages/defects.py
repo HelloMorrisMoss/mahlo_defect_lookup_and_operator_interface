@@ -9,6 +9,6 @@ register_page(
 
 
 def layout():
-    from app.dashapp1.layout import layout as defect_layout
+    from app.defects_app.layout import layout as defect_layout
 
     return defect_layout
