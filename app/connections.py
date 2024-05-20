@@ -1,10 +1,11 @@
 from datetime import datetime
 from traceback import format_exc
+from typing import List
 
 import pandas as pd
 import requests
 
-from untracked_config import defects_list_address
+from untracked_config import defects_list_address, operator_data_address
 
 
 def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
@@ -37,11 +38,8 @@ def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.Da
         return pd.DataFrame.from_dict({'defect_data': ['failed to load']})
 
 
-if __name__ == '__main__':
-    import datetime as dt
+def get_operator_data() -> List[dict]:
+    """Get the operators data from the Mahlo popup server as a list of dictionaries."""
 
-    a_day = dt.timedelta(days=1.0)
-    now = datetime.now()
-    yesterday = now - a_day
-    ddf = get_defects(start_date=yesterday, end_date=now)
-    print(ddf.head())
+    response = requests.get(operator_data_address, timeout=20)
+    return response.json()
