@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from flask import Flask
 from flask_login import login_required
 
-from app.operators_app.layout import register_operator_callbacks
+from app.operators_app.callbacks import register_operator_callbacks
 from config import BaseConfig
 from multipage_app import generate_dash_multipage_layout
 
