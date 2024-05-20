@@ -4,7 +4,7 @@ import pandas as pd
 from dash import dash_table
 
 from app.connections import get_defects
-from app.dashapp1.default_dates import get_start_end_dates
+from app.defects_app.default_dates import get_start_end_dates
 
 style_data = [
     # highlight the whole row when selected

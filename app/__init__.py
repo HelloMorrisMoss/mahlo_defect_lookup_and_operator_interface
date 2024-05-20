@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 from flask import Flask
 from flask_login import login_required
 
-from app.operators.layout import register_operator_callbacks
+from app.operators_app.layout import register_operator_callbacks
 from config import BaseConfig
 from multipage_app import generate_dash_multipage_layout
 
@@ -21,7 +21,7 @@ def create_app():
 
 def register_dashapps(flask_app):
     # from app.dashapp1.layout import layout
-    from app.dashapp1.callbacks import register_callbacks
+    from app.defects_app.callbacks import register_callbacks
 
     # Meta tags for viewport responsiveness
     meta_viewport = {

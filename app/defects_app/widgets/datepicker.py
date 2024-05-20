@@ -2,7 +2,7 @@ from datetime import datetime as dt
 
 from dash import dcc
 
-from app.dashapp1.default_dates import A_MONTH
+from app.defects_app.default_dates import A_MONTH
 
 
 def get_date_picker(start_date, end_date):
