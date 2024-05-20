@@ -1,4 +1,4 @@
-from dash import register_page  # , callback # If you need callbacks, import it here.
+from dash import register_page
 
 register_page(
     __name__,
@@ -9,6 +9,6 @@ register_page(
 
 
 def layout():
-    from scratch_4 import operator_layout
+    from scratch_4 import get_operator_layout
 
-    return operator_layout
+    return get_operator_layout()

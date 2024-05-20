@@ -12,7 +12,7 @@ from werkzeug.urls import url_parse
 from app.extensions import db
 from app.forms import LoginForm
 from app.forms import RegistrationForm
-from app.models import User
+from app.models import User  # todo: look into how this is implemented - database cybersecurity, etc.
 
 server_bp = Blueprint('main', __name__)
 
@@ -43,6 +43,7 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
+@server_bp.route('/dashboard/logout/')
 @server_bp.route('/logout/')
 @login_required
 def logout():
@@ -66,8 +67,3 @@ def register():
         return redirect(url_for('main.login'))
 
     return render_template('register.html', title='Register', form=form)
-
-# @server_bp.route('/dash_multipage/', methods=['GET', 'POST'])
-# def dash_multipage():
-#     print('rendering dash_multipage')
-#     return render_template('dash_multipage.html', title='Dash Multipage')
