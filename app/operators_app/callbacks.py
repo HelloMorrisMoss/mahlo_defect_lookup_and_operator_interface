@@ -1,33 +1,18 @@
-from pprint import pformat
+"""Register callbacks with the Dash app for the operators page.
+
+register_operator_callbacks: function that registers the callbacks for the operator page.
+"""
 
 import requests
 from dash import Output, Input, State
 
-from app.operators_app.layout import get_operator_data, operator_data_address, empty_table_data
+from app.connections import get_operator_data
+from app.operators_app.layout import empty_table_data
+from untracked_config import operator_data_address
 
 
 def register_operator_callbacks(app):
-    # Callbacks
-    @app.callback(Output('test_data_store', 'data'),
-                  [Input('save_test_data', 'n_clicks'),
-                   State('operator_data_table', 'data')])
-    def save_test_data(n_clicks, data):
-        # save changes made when the save button clicked
-        print('save test data')
-        return data if n_clicks else None
-
-    @app.callback(Output('check_table', 'data'),
-                  Input('test_data_store', 'data'))
-    def restore_saved_test_data(data):
-        # update the
-        print('restore saved test data')
-        # return data
-        return get_operator_data()
-
-    @app.callback(Output('output-container', 'value'),
-                  Input('test_data_store', 'data'), )
-    def display_stored_data(data):
-        return pformat(data)
+    """Register callbacks with the Dash app for the operators page."""
 
     @app.callback([Output('operator_data_table', 'data'),
                    Output('new_op_data_store', 'data'), ],
