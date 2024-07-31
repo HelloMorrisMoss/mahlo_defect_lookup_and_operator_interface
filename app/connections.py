@@ -5,7 +5,7 @@ from typing import List
 import pandas as pd
 import requests
 
-from untracked_config import defects_list_address, operator_data_address
+from untracked_config.server_address import defects_list_address, operator_data_address
 
 
 def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
