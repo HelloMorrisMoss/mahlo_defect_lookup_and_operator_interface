@@ -43,7 +43,10 @@ def get_operator_layout():
     current_operators_div = html.Div(id='current_operators_div',
                                      style=current_operators_div_style,
                                      children=[dag.AgGrid(id='operator_ag_grid', columnDefs=column_defs,
-                                                          rowData=op_records, style={'height': '100%'})])
+                                                          dashGridOptions={'rowSelection': 'multiple'},
+                                                          rowData=op_records, style={'height': '100%'},
+                                                          getRowId='params.data.id',
+                                                          )])
 
     # an empty row on another grid to enter new operator data
     new_operator_div = html.Div(id='new_operator_div',
@@ -59,6 +62,7 @@ def get_operator_layout():
                                     children=[
                                         html.Button('New operator', id='save_new_operator', n_clicks=0),
                                         html.Button('Save data', id='save_test_data', n_clicks=0),
+                                        html.Button('Enable or disable operator', id='op_disenable_button', n_clicks=0),
                                         dcc.Store(id='test_data_store'),
                                         dcc.Store(id='new_op_data_store'),  # todo: do we need to store this here?
                                     ])
