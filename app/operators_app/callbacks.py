@@ -7,6 +7,7 @@ import pandas as pd
 import requests
 from dash import Output, Input, State
 
+from __init__ import lg
 from app.connections import get_operator_data
 from app.operators_app.layout import empty_table_data
 from untracked_config.server_address import operator_data_address
@@ -61,10 +62,6 @@ def register_operator_callbacks(app):
                 return get_operator_data(), empty_table_data, empty_table_data
             else:
                 return None, None, None
-
-    @app.callback([Input('save_new_operator', 'n_clicks')])
-    def test_click(n_clicks):
-        print(f'{n_clicks=}')
 
     @app.callback(
         [Output('operator_ag_grid', 'rowData', allow_duplicate=True),
