@@ -50,10 +50,15 @@ def get_operator_layout():
                                                           )])
 
     # an empty row on another grid to enter new operator data
+    edit_bg_stl = {'background-color': '#009e73'}  # style for cells that can be edited
+    inedit_bg_stl = {'background-color': '#606060'}  # ineditable, don't eat it
+    # this version to define both editable and not background colors
+    # new_op_column_defs = [d | {'cellStyle': edit_bg_stl if d['editable'] else inedit_bg_stl} for d in column_defs]
+    new_op_column_defs = [d | {'cellStyle': inedit_bg_stl} if not d['editable'] else d for d in column_defs]
     new_operator_div = html.Div(id='new_operator_div',
                                 style=new_operator_div_style,
                                 children=[dag.AgGrid(id='new_operator_ag_grid',
-                                                     columnDefs=column_defs,
+                                                     columnDefs=new_op_column_defs,
                                                      rowData=empty_table_data,
                                                      style={'height': '100%'})])
 
