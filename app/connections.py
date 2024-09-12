@@ -5,6 +5,7 @@ from typing import List
 import pandas as pd
 import requests
 
+from __init__ import lg
 from untracked_config.server_address import defects_list_address, operator_data_address
 
 
@@ -42,4 +43,7 @@ def get_operator_data() -> List[dict]:
     """Get the operators data from the Mahlo popup server as a list of dictionaries."""
 
     response = requests.get(operator_data_address, timeout=20)
-    return response.json()
+    lg.debug(f'{operator_data_address=}')
+    lg.debug(f'{response=}')
+    lg.debug(f'{response.content=}')
+    lg.debug(f'{response.text=}')
