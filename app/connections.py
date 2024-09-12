@@ -39,7 +39,7 @@ def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.Da
         return pd.DataFrame.from_dict({'defect_data': ['failed to load']})
 
 
-def get_operator_data() -> List[dict]:
+def get_operator_data(show_deactivated_operators=False) -> List[dict]:
     """Get the operators data from the Mahlo popup server as a list of dictionaries."""
 
     response = requests.get(operator_data_address, timeout=20)
@@ -47,3 +47,9 @@ def get_operator_data() -> List[dict]:
     lg.debug(f'{response=}')
     lg.debug(f'{response.content=}')
     lg.debug(f'{response.text=}')
+
+    if not show_deactivated_operators:
+        return_json = [op for op in response.json() if op.get('date_removed') is None]
+    else:
+        return_json = response.json()
+    return return_json

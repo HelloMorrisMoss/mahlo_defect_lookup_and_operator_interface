@@ -20,8 +20,9 @@ pd.set_option('display.width', 1000)
 def register_operator_callbacks(app):
     @app.callback(Output('test_data_store', 'data'),
                   [Input('save_test_data', 'n_clicks'),
-                   # State('operator_data_table', 'data')])
-                   State('operator_ag_grid', 'rowData')],
+                   State('operator_ag_grid', 'rowData'),
+                   # State('show_deactivated_operators_checkbox', 'value'),  # don't need, returns current data
+                   ],
                   prevent_initial_call=True)
     def save_test_data(n_clicks, data):
         if n_clicks:
@@ -43,23 +44,29 @@ def register_operator_callbacks(app):
             #  can maybe get away with if the response is affirmative then return the data as it was
             #  after it was changed. it SHOULD be fine, but leaves more opportunity for things that go
             #  wrong to be missed or propagate into further issues
+            #  if done, add show_deactivated_operators_checkbox state to inputs to filter return data
+        else:
+            lg.debug(f'save_test_data ran without n_clicks: {n_clicks=}')
         return data if n_clicks else None
 
     @app.callback([Output('operator_ag_grid', 'rowData', allow_duplicate=True),
                    Output('new_op_data_store', 'data'),
                    Output('new_operator_ag_grid', 'rowData')],
                   [Input('save_new_operator', 'n_clicks'),
-                   State('new_operator_ag_grid', 'rowData')],
+                   State('new_operator_ag_grid', 'rowData'),
+                   State('show_deactivated_operators_checkbox', 'value'),
+                   ],
                   prevent_initial_call=True
                   )
-    def save_new_operator(n_clicks, data):
+    def save_new_operator(n_clicks, data, show_deactivated):
         """Add a new operator as entered into the new operator table.
 
         Updating the operator table and clearing the new op table."""
         if n_clicks > 0:
             new_op_response = requests.post(operator_data_address, json=data[0])
             if new_op_response.status_code in [200, 201]:
-                return get_operator_data(), empty_table_data, empty_table_data
+                return get_operator_data(
+                    show_deactivated_operators=show_deactivated), empty_table_data, empty_table_data
             else:
                 return None, None, None
 
@@ -68,10 +75,11 @@ def register_operator_callbacks(app):
          Output('operator_ag_grid', 'selectedRows')],
         [Input('op_disenable_button', 'n_clicks'),
          State('operator_ag_grid', 'selectedRows'),
+         State('show_deactivated_operators_checkbox', 'value'),
          # State('operator_ag_grid', 'rowData')
          ],
         prevent_initial_call=True)
-    def disable_or_enable_selected_operator(n_clicks, selected_rows):
+    def disable_or_enable_selected_operator(n_clicks, selected_rows, show_deactivated):
         if selected_rows is not None:
             reselect_rows = [row.get('id') for row in selected_rows]
             for row in selected_rows:
@@ -84,7 +92,18 @@ def register_operator_callbacks(app):
 
             # the js function works, but then it (not rows) will be what is returned by selectedRows next callback
             # reselect_fn = {'function': f'{reselect_rows} includes params.data.id'}  # javascript function
-            updated_op_data = get_operator_data()
+            updated_op_data = get_operator_data(show_deactivated_operators=show_deactivated)
             return updated_op_data, {'ids': reselect_rows}
         else:
             return None, None
+
+    @app.callback(
+        Output('operator_ag_grid', 'rowData'),
+        [Input('show_deactivated_operators_checkbox', 'value'),  # Update the grid if new data is saved as well
+         State('operator_ag_grid', 'rowData'), ],
+        prevent_initial_call=True
+    )
+    def show_hide_deactivated_operators(checkbox_value, row_data):
+        """When the show_deactivated_operators_checkbox is clicked, update the aggrid (table) based on the new value."""
+
+        return get_operator_data(show_deactivated_operators=checkbox_value)
