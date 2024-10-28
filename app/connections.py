@@ -18,16 +18,16 @@ def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.Da
             'start_date': start_date.isoformat() if not isinstance(start_date, str) else start_date,
             'end_date': end_date.isoformat() if not isinstance(end_date, str) else end_date,
             }
-        response = requests.get(defects_list_address, params=data, timeout=20)
+        response = requests.get(defects_list_address, json=data, timeout=20)
         response_dict = response.json()
         defects_columns = response_dict['default_column_order']
         defects_dict = response_dict['results_dict']
         defects_df = pd.DataFrame.from_dict(defects_dict).T
-        defects_df = defects_df[defects_columns]
         if not len(defects_df):
             print('No records found')
             defects_df = pd.DataFrame.from_dict({'defect_data': ['No Records Found.']})
         else:
+            defects_df = defects_df[defects_columns]
             for idx, col in enumerate(defects_df):  # loop through all columns
                 if col.endswith('_ts') or col.endswith('_time'):
                     defects_df[col] = pd.to_datetime(defects_df[col]).dt.tz_localize(None)  # excel can't do timezones
@@ -42,7 +42,7 @@ def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.Da
 def get_operator_data(show_deactivated_operators=False) -> List[dict]:
     """Get the operators data from the Mahlo popup server as a list of dictionaries."""
 
-    response = requests.get(operator_data_address, timeout=20)
+    response = requests.get(operator_data_address, json=[], timeout=20)
     lg.debug(f'{operator_data_address=}')
     lg.debug(f'{response=}')
     lg.debug(f'{response.content=}')
