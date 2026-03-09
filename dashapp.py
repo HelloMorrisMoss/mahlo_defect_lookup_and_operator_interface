@@ -12,3 +12,4 @@ if __name__ == '__main__':
     host = '0.0.0.0'
     print(f'{datetime.now()} - Serving on: {host}:{port}')
     waitress.serve(server, host=host, port=port, threads=2)
+    # server.run(port=port, host=host, use_reloader=True)
