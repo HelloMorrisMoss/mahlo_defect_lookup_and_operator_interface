@@ -107,3 +107,86 @@ def register_operator_callbacks(app):
         """When the show_deactivated_operators_checkbox is clicked, update the aggrid (table) based on the new value."""
 
         return get_operator_data(show_deactivated_operators=checkbox_value)
+# TODO: logger, docstrings, handle connection failures
+
+# app.clientside_callback(
+#     """
+#     function(params) {
+#         var dagfuncs = window.dashAgGridFunctions = window.dashAgGridFunctions || {};
+#
+#         dagfuncs.addEdits = function(params) {
+#             console.log(params);  // Debugging line
+#             if (!params.data) {
+#                 console.log('addEdits was called with params.data undefined');
+#             }
+#             if (params && params.data && params.data.changes && params.colDef && params.colDef.field) {
+#                 var newList = JSON.parse(params.data.changes);
+#                 newList.push(params.colDef.field);
+#                 params.data.changes = JSON.stringify(newList);
+#             } else if (params && params.data && params.colDef && params.colDef.field) {
+#                 params.data.changes = JSON.stringify([params.colDef.field]);
+#             }
+#             if (params && params.data && params.colDef && params.colDef.field) {
+#                 params.data[params.colDef.field] = params.newValue;
+#             }
+#             console.log(params.data);  // Log the data after modification
+#             return true;
+#         };
+#
+#         dagfuncs.highlightEdits = function(params) {
+#             console.log(params);  // Debugging line
+#             if (!params.data) {
+#                 console.log('highlightEdits was called with params.data undefined');
+#             }
+#             if (params && params.data && params.data.changes && params.colDef && params.colDef.field) {
+#                 if (JSON.parse(params.data.changes).includes(params.colDef.field)) {
+#                     return true;
+#                 }
+#             }
+#             return false;
+#         };
+#
+#         return dagfuncs;
+#     }
+#     """,
+#     Output('operator_ag_grid', 'rowData', allow_duplicate=True),
+#     Input('operator_ag_grid', 'cellValueChanged'),
+#     prevent_initial_call=True,
+# )
+
+
+#     app.clientside_callback(
+#         """
+#         dagfuncs.highlightEdits = function(params) {
+#     if (params.data) {
+#     If (params.data.changes) {
+#     if (JSON.parse(params.data.changes).includes(params.colDef.field))
+#         {return true}
+#     }
+#     return false;
+# }
+# }
+#         """,
+#         Output('operator_ag_grid', 'rowData', allow_duplicate=True),
+#         Input('operator_ag_grid', 'cellValueChanged'),
+#         prevent_initial_call=True,
+#     )
+
+
+# app.clientside_callback(
+#     """
+#     function(data, scale) {
+#     console.log(data);  // Debugging line
+#     console.log(scale);  // Debugging line
+#         return {
+#             'data': data,
+#             'layout': {
+#                  'yaxis': {'type': scale}
+#              }
+#         }
+#     }
+#     """,
+#     Output('clientside-graph', 'figure'),
+#     Input('clientside-figure-store', 'data'),
+#     Input('clientside-graph-scale', 'value')
+# )

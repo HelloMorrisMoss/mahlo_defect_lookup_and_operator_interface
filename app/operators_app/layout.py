@@ -47,6 +47,7 @@ def get_operator_layout():
                                                           dashGridOptions={'rowSelection': 'multiple'},
                                                           rowData=op_records, style={'height': '100%'},
                                                           getRowId='params.data.id',
+                                                          # dashGridOptions={'cellValueChanged': {"function": "params.value && {'backgroundColor': 'rgb(255,0,0}'"}},
                                                           )])
 
     # an empty row on another grid to enter new operator data
@@ -60,7 +61,9 @@ def get_operator_layout():
                                 children=[dag.AgGrid(id='new_operator_ag_grid',
                                                      columnDefs=new_op_column_defs,
                                                      rowData=empty_table_data,
-                                                     style={'height': '100%'})])
+                                                     style={'height': '100%'},
+                                                     # dashGridOptions={'cellValueChanged': {"function": "params.value && {'backgroundColor': 'rgb(255,0,0,' + params.value/8 + ')'}"}}
+                                                     )])
 
     # buttons for sending new or updated data to the server
     operators_button_div = html.Div(id='operators_button_div',
