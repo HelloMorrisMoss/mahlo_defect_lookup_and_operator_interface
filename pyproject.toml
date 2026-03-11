@@ -33,7 +33,7 @@ py-modules = ["dashapp", "root_logger"]
 package = true
 
 [tool.uv.sources]
-commonlog = { path = "C:/Users/lmcglaughlin_local/PycharmProjects/commonlog" }
+commonlog = { git = "https://github.com/HelloMorrisMoss/logger_setup.git" }
 
 [build-system]
 requires = ["setuptools>=61.0.0"]
