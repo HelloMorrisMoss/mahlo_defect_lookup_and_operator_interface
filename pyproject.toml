@@ -1,26 +1,40 @@
-[tool.poetry]
+[project]
 name = "dash_on_flask"
 version = "0.1.0"
 description = "Dash app integrated with Flask and authentication"
-authors = ["Oleg Komarov <oleg.komarov11@gmail.com>"]
-license = "MIT License"
+requires-python = ">=3.11"
+dependencies = [
+    "Flask>=1.1.2",
+    "Flask-Login>=0.5.0",
+    "Flask-SQLAlchemy>=2.5.1",
+    "Flask-Migrate>=2.7.0",
+    "Flask-WTF>=0.14.3",
+    "dash>=1.20.0",
+    "pandas-datareader>=0.9.0",
+    "gunicorn>=20.1.0",
+    "python-dotenv>=0.17.1",
+    "waitress",
+    "dash-bootstrap-components",
+    "dash-ag-grid",
+    "commonlog",
+    "pandas",
+    "requests",
+    "SQLAlchemy",
+]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-Flask = "^1.1.2"
-Flask-Login = "^0.5.0"
-Flask-SQLAlchemy = "^2.5.1"
-Flask-Migrate = "^2.7.0"
-Flask-WTF = "^0.14.3"
-dash = "^1.20.0"
-pandas-datareader = "^0.9.0"
-gunicorn = "^20.1.0"
-python-dotenv = "^0.17.1"
+[project.scripts]
+app-server = "dashapp:main"
 
-[tool.poetry.dev-dependencies]
-flake8 = "^3.9.1"
-isort = "^5.8.0"
+[tool.setuptools]
+packages = ["app"]
+py-modules = ["dashapp", "root_logger"]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+commonlog = { path = "C:/Users/lmcglaughlin_local/PycharmProjects/commonlog" }
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
