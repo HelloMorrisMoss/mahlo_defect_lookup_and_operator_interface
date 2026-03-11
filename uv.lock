@@ -107,7 +107,7 @@ wheels = [
 [[package]]
 name = "commonlog"
 version = "2024.9.0"
-source = { directory = "../commonlog" }
+source = { git = "https://github.com/HelloMorrisMoss/logger_setup.git#f09ecb131245817c9ea902021af25a113478138c" }
 
 [[package]]
 name = "dash"
@@ -178,7 +178,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "commonlog", directory = "../commonlog" },
+    { name = "commonlog", git = "https://github.com/HelloMorrisMoss/logger_setup.git" },
     { name = "dash", specifier = ">=1.20.0" },
     { name = "dash-ag-grid" },
     { name = "dash-bootstrap-components" },
