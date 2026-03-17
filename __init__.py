@@ -15,7 +15,7 @@ os.environ['NO_PROXY'] = ','.join(no_proxy_list)
 try:
     import commonlog
 
-    lg = commonlog.single_logger()
+    lg = commonlog.single_logger(file_log=".\mahlo_dash_app.log")
     # pip install upgrade C:/Users/lmcglaughlin/PycharmProjects/commonlog
 except ImportError:
     import logging
