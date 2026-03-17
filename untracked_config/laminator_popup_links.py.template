@@ -1,0 +1,3 @@
+# dynamically add these to the dropdown menu on the nav bar
+# Example: {'Lam1 Popup': 'http://10.155.0.84:5000/controls'}
+lam_addresses = {'LABEL_FOR_POPUP': 'http://your-server-address:5000/controls'}

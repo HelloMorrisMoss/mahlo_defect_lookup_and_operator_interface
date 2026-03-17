@@ -9,6 +9,7 @@ environment-specific settings (e.g., local hostnames, server addresses).
     * Copy `development_node.py.template` to `development_node.py`
     * Copy `server_address.py.template` to `server_address.py`
     * Copy `no_proxy_ips.py.template` to `no_proxy_ips.py`
+   * Copy `laminator_popup_links.py.template` to `laminator_popup_links.py`
 2. Edit the new `.py` files with your local or environment-specific values.
 
 ## Files
@@ -27,3 +28,8 @@ services.
 
 Contains a list of IP addresses that should bypass the corporate proxy. This is particularly important for the
 `requests` library on Windows, which doesn't support wildcards in `NO_PROXY`.
+
+### `laminator_popup_links.py`
+
+Contains a dictionary of labels and URLs for the dropdown menu on the navigation bar. These links are dynamically
+added to the navbar.

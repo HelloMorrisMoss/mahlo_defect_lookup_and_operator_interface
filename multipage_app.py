@@ -7,9 +7,13 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 
+from untracked_config.laminator_popup_links import lam_addresses
+
 
 def create_navbar(*args, **kwargs):
     """Create the Dash navigation bar."""
+
+    lam_links = [dbc.DropdownMenuItem(name, href=address) for (name, address) in lam_addresses.items()]
 
     navbar = dbc.NavbarSimple(
         children=[
@@ -23,6 +27,7 @@ def create_navbar(*args, **kwargs):
                     dbc.DropdownMenuItem(divider=True),
                     dbc.DropdownMenuItem("Defects Table", href='/dashboard/defects'),
                     dbc.DropdownMenuItem("Laminator Operators", href='/dashboard/operators'),
+                    *lam_links,
                     dbc.Button(
                         # dbc.NavLink(
                         ["Logout"],
