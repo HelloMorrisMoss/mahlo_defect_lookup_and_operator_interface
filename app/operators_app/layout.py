@@ -70,10 +70,10 @@ def get_operator_layout():
                                     style=operators_button_div_style,
                                     children=[
                                         html.Button('Save new operator', id='save_new_operator', n_clicks=0),
-                                        html.Button('Save data', id='save_test_data', n_clicks=0),
+                                        html.Button('Save changes', id='save_operator_edits', n_clicks=0),
                                         html.Button('Enable or disable operator', id='op_disenable_button',
                                                     n_clicks=0),
-                                        dcc.Store(id='test_data_store'),
+                                        dcc.Store(id='operator_edits_store'),
                                         dcc.Store(id='new_op_data_store'),  # todo: do we need to store this here?
                                         dbc.Checkbox(id='show_deactivated_operators_checkbox', value=False,
                                                      label='Show deactivated operators'),
