@@ -1,0 +1,5 @@
+# IP addresses that should bypass the corporate proxy.
+# The requests library on Windows does not support wildcards in NO_PROXY (e.g., 10.155.*),
+# so explicit IP addresses must be used.
+
+no_proxy_ip_addresses = ['127.0.0.1', 'localhost']

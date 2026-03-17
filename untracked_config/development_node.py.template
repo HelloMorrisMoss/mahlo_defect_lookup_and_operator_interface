@@ -1,0 +1,10 @@
+"""Contains a boolean 'constant' that is true on the development system and false otherwise."""
+
+import platform
+from typing import Final
+
+# Add hostnames of development systems here
+__dev_node_names = ['YOUR_HOSTNAME_HERE']
+
+HOSTNAME: Final[str] = platform.node()
+ON_DEV_NODE: Final[bool] = HOSTNAME in __dev_node_names
