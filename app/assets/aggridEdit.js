@@ -1,7 +1,6 @@
 var dagfuncs = window.dashAgGridFunctions = window.dashAgGridFunctions || {};
 
 dagfuncs.addEdits = function (params) {
-    console.log(params);  // Debugging line
     if (!params.data) {
         console.log('addEdits was called with params.data undefined');
     }
@@ -19,7 +18,6 @@ dagfuncs.addEdits = function (params) {
 }
 
 dagfuncs.highlightEdits = function (params) {
-    console.log(params);  // Debugging line
     if (!params.data) {
         console.log('highlightEdits was called with params.data undefined');
     }
@@ -33,16 +31,6 @@ dagfuncs.highlightEdits = function (params) {
 
 
 dagfuncs.alwaysTrue = function (params) {
-    console.log(params);  // Debugging line
-
     return true;
 }
 
-
-// dagfuncs.highlightEdits = function(params) {
-//     if (params.data.changes) {
-//     if (JSON.parse(params.data.changes).includes(params.colDef.field))
-//         {return true}
-//     }
-//     return false;
-// }

@@ -18,13 +18,12 @@ pd.set_option('display.width', 1000)
 
 
 def register_operator_callbacks(app):
-    @app.callback(Output('test_data_store', 'data'),
-                  [Input('save_test_data', 'n_clicks'),
+    @app.callback(Output('operator_edits_store', 'data'),
+                  [Input('save_operator_edits', 'n_clicks'),
                    State('operator_ag_grid', 'rowData'),
-                   # State('show_deactivated_operators_checkbox', 'value'),  # don't need, returns current data
                    ],
                   prevent_initial_call=True)
-    def save_test_data(n_clicks, data):
+    def save_operator_edits(n_clicks, data):
         if n_clicks:
             # save changes made when the save button clicked
             updated_operator_df = pd.DataFrame.from_records(data)
@@ -34,19 +33,11 @@ def register_operator_callbacks(app):
                            .query('_merge=="left_only"')
                            .drop('_merge', axis=1))
 
-
-            # todo: can loop over the rows like this... or do it properly and send a list
-            # this has finally overcome the 'not application/json' 415 error
             for (ri, row) in new_rows_df.iterrows():
-                new_op_response = requests.put(operator_data_address, json=row.to_dict())
+                requests.put(operator_data_address, json=row.to_dict())
 
-            # todo: probably request fresh data to return here...
-            #  can maybe get away with if the response is affirmative then return the data as it was
-            #  after it was changed. it SHOULD be fine, but leaves more opportunity for things that go
-            #  wrong to be missed or propagate into further issues
-            #  if done, add show_deactivated_operators_checkbox state to inputs to filter return data
         else:
-            lg.debug(f'save_test_data ran without n_clicks: {n_clicks=}')
+            lg.debug(f'save_operator_edits ran without n_clicks: {n_clicks=}')
         return data if n_clicks else None
 
     @app.callback([Output('operator_ag_grid', 'rowData', allow_duplicate=True),
@@ -107,86 +98,3 @@ def register_operator_callbacks(app):
         """When the show_deactivated_operators_checkbox is clicked, update the aggrid (table) based on the new value."""
 
         return get_operator_data(show_deactivated_operators=checkbox_value)
-# TODO: logger, docstrings, handle connection failures
-
-# app.clientside_callback(
-#     """
-#     function(params) {
-#         var dagfuncs = window.dashAgGridFunctions = window.dashAgGridFunctions || {};
-#
-#         dagfuncs.addEdits = function(params) {
-#             console.log(params);  // Debugging line
-#             if (!params.data) {
-#                 console.log('addEdits was called with params.data undefined');
-#             }
-#             if (params && params.data && params.data.changes && params.colDef && params.colDef.field) {
-#                 var newList = JSON.parse(params.data.changes);
-#                 newList.push(params.colDef.field);
-#                 params.data.changes = JSON.stringify(newList);
-#             } else if (params && params.data && params.colDef && params.colDef.field) {
-#                 params.data.changes = JSON.stringify([params.colDef.field]);
-#             }
-#             if (params && params.data && params.colDef && params.colDef.field) {
-#                 params.data[params.colDef.field] = params.newValue;
-#             }
-#             console.log(params.data);  // Log the data after modification
-#             return true;
-#         };
-#
-#         dagfuncs.highlightEdits = function(params) {
-#             console.log(params);  // Debugging line
-#             if (!params.data) {
-#                 console.log('highlightEdits was called with params.data undefined');
-#             }
-#             if (params && params.data && params.data.changes && params.colDef && params.colDef.field) {
-#                 if (JSON.parse(params.data.changes).includes(params.colDef.field)) {
-#                     return true;
-#                 }
-#             }
-#             return false;
-#         };
-#
-#         return dagfuncs;
-#     }
-#     """,
-#     Output('operator_ag_grid', 'rowData', allow_duplicate=True),
-#     Input('operator_ag_grid', 'cellValueChanged'),
-#     prevent_initial_call=True,
-# )
-
-
-#     app.clientside_callback(
-#         """
-#         dagfuncs.highlightEdits = function(params) {
-#     if (params.data) {
-#     If (params.data.changes) {
-#     if (JSON.parse(params.data.changes).includes(params.colDef.field))
-#         {return true}
-#     }
-#     return false;
-# }
-# }
-#         """,
-#         Output('operator_ag_grid', 'rowData', allow_duplicate=True),
-#         Input('operator_ag_grid', 'cellValueChanged'),
-#         prevent_initial_call=True,
-#     )
-
-
-# app.clientside_callback(
-#     """
-#     function(data, scale) {
-#     console.log(data);  // Debugging line
-#     console.log(scale);  // Debugging line
-#         return {
-#             'data': data,
-#             'layout': {
-#                  'yaxis': {'type': scale}
-#              }
-#         }
-#     }
-#     """,
-#     Output('clientside-graph', 'figure'),
-#     Input('clientside-figure-store', 'data'),
-#     Input('clientside-graph-scale', 'value')
-# )
