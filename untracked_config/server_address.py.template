@@ -1,0 +1,7 @@
+# Server addresses for defects and operator data provided by the MahloPopup server.
+
+# Example: r'http://10.155.0.21:5000/defects'
+defects_list_address = r'http://your-server-address:5000/defects'
+
+# Example: 'http://10.155.0.21:5000/operator'
+operator_data_address = 'http://your-server-address:5000/operator'
