@@ -15,4 +15,7 @@ __pycache__
 app.db
 
 # mahlo_defect_table_lookup
-/untracked_config/*
+/untracked_config/*.py
+!/untracked_config/__init__.py
+!/untracked_config/*.template
+!/untracked_config/README.md
