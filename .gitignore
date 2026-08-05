@@ -19,3 +19,10 @@ app.db
 !/untracked_config/__init__.py
 !/untracked_config/*.template
 !/untracked_config/README.md
+/.specify/
+/.junie/
+/.idea/
+/investigations/
+/data_files/
+/dash_on_flask.egg-info/
+/mahlo_dash_app.log
