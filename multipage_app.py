@@ -27,6 +27,7 @@ def create_navbar(*args, **kwargs):
                     dbc.DropdownMenuItem(divider=True),
                     dbc.DropdownMenuItem("Defects Table", href='/dashboard/defects'),
                     dbc.DropdownMenuItem("Laminator Operators", href='/dashboard/operators'),
+                    dbc.DropdownMenuItem("Help System Editor", href='/help/editor'),
                     *lam_links,
                     dbc.Button(
                         # dbc.NavLink(

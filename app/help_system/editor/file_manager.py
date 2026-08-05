@@ -3,7 +3,10 @@ import os
 import shutil
 from typing import List, Dict
 
-from help_window import lg
+from flask import current_app
+import logging
+
+lg = logging.getLogger(__name__)
 
 
 def update_all_references(content_dir: str, old_path: str, new_path: str):
@@ -87,7 +90,7 @@ def rename_resource(project_root: str, old_abs_path: str, new_name: str):
     os.rename(old_abs_path, new_abs_path)
 
     # Update references in all articles
-    content_dir = os.path.join(project_root, "help_window", "help_content")
+    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
     update_all_references(content_dir, old_rel, new_rel)
 
     return new_abs_path
@@ -108,10 +111,10 @@ def delete_resource(project_root: str, abs_path: str):
 def get_media_dir(project_root: str, article_path: str) -> str:
     """
     Determines the appropriate media directory for an article.
-    Help content is in project_root/help_window/help_content/.
+    Help content is in project_root/app/help_system/help_content/.
     Returns the absolute path to the media directory.
     """
-    content_dir = os.path.join(project_root, "help_window", "help_content")
+    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
 
     if not article_path:
         media_dir = os.path.join(content_dir, "media")
@@ -191,7 +194,7 @@ def move_resource(project_root: str, old_abs_path: str, new_parent_dir: str):
     shutil.move(old_abs_path, new_abs_path)
 
     # Update references in all articles
-    content_dir = os.path.join(project_root, "help_window", "help_content")
+    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
     update_all_references(content_dir, old_rel, new_rel)
 
     return new_abs_path

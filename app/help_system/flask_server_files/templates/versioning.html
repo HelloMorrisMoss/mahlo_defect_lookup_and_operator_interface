@@ -255,7 +255,7 @@
 
 <script>
     async function loadVersions() {
-        const response = await fetch('/api/versions/history');
+        const response = await fetch('api/versions/history');
         const versions = await response.json();
         const list = document.getElementById('version-list');
         list.innerHTML = '';
@@ -286,7 +286,7 @@
 
     async function createVersion() {
         const comment = document.getElementById('version-comment').value;
-        const response = await fetch('/api/versions/create', {
+        const response = await fetch('api/versions/create', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({comment})
@@ -301,7 +301,7 @@
 
     async function publishVersion(id) {
         if (!confirm('Are you sure you want to publish this version? This will become the current version for all subscribers.')) return;
-        const response = await fetch('/api/versions/publish', {
+        const response = await fetch('api/versions/publish', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({id})
@@ -314,7 +314,7 @@
     }
 
     async function viewDiff(id) {
-        const response = await fetch(`/api/versions/diff/${id}`);
+        const response = await fetch(`api/versions/diff/${id}`);
         const diff = await response.json();
 
         const list = document.getElementById('diff-changes-list');
@@ -349,7 +349,7 @@
 
     async function showFileDiff(path, oldHash, newHash) {
         document.getElementById('current-diff-file').innerText = path;
-        const response = await fetch(`/api/versions/file_diff?path=${encodeURIComponent(path)}&old_hash=${oldHash}&new_hash=${newHash}`);
+        const response = await fetch(`api/versions/file_diff?path=${encodeURIComponent(path)}&old_hash=${oldHash}&new_hash=${newHash}`);
         const data = await response.json();
 
         const diffContent = document.getElementById('diff-content');
@@ -379,14 +379,14 @@
                 oldItem.className = 'image-diff-item';
                 oldItem.innerHTML = '<span class="image-diff-label">Previous</span>';
                 const oldImg = document.createElement('img');
-                oldImg.src = `/api/blob/${oldHash}`;
+                oldImg.src = `api/blob/${oldHash}`;
                 oldItem.appendChild(oldImg);
 
                 const newItem = document.createElement('div');
                 newItem.className = 'image-diff-item';
                 newItem.innerHTML = '<span class="image-diff-label">Current</span>';
                 const newImg = document.createElement('img');
-                newImg.src = `/api/blob/${newHash}`;
+                newImg.src = `api/blob/${newHash}`;
                 newItem.appendChild(newImg);
 
                 container.appendChild(oldItem);
@@ -394,7 +394,7 @@
                 diffContent.appendChild(container);
             } else {
                 const img = document.createElement('img');
-                img.src = `/api/blob/${newHash || oldHash}`;
+                img.src = `api/blob/${newHash || oldHash}`;
                 img.style.maxWidth = '100%';
                 img.style.display = 'block';
                 img.style.margin = '0 auto';

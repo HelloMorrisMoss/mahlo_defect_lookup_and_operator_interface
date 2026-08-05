@@ -4,7 +4,7 @@ let previousArticlePath = null;
 let expandedFolders = new Set(["Root"]); // Root expanded by default
 
 async function refreshArticleList() {
-    const response = await fetch('/api/structure');
+    const response = await fetch('api/structure');
     const tree = await response.json();
     const list = document.getElementById('article-list');
     list.innerHTML = '';
@@ -96,7 +96,7 @@ function toggleFolder(path) {
 async function loadArticle(path, title) {
     if (currentArticlePath) previousArticlePath = currentArticlePath;
     currentArticlePath = path;
-    const response = await fetch(`/api/article?path=${encodeURIComponent(path)}`);
+    const response = await fetch('api/article?path=${encodeURIComponent(path)}');
     currentArticleData = await response.json();
 
     document.getElementById('current-article-name').textContent = title;
@@ -306,7 +306,7 @@ function cancelEdit() {
 
 async function consolidateMedia() {
     try {
-        const response = await fetch('/api/consolidate', {
+        const response = await fetch('api/consolidate', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({path: currentArticlePath, content: currentArticleData})
@@ -363,7 +363,7 @@ function hideModal() {
 }
 
 async function findAndLoadDefaultArticle() {
-    const response = await fetch('/api/articles');
+    const response = await fetch('api/articles');
     const articles = await response.json();
     let target = articles.find(a => a.file_path.includes('help_for_help.json'));
     if (!target && articles.length > 0) target = articles[0];
@@ -374,7 +374,7 @@ async function findAndLoadDefaultArticle() {
 }
 
 async function showMediaBrowser(path) {
-    const response = await fetch(`/api/media_list?path=${encodeURIComponent(path)}`);
+    const response = await fetch(`api/media_list?path=${encodeURIComponent(path)}`);
     const files = await response.json();
 
     let body = '<div class="media-grid">';
@@ -420,7 +420,7 @@ function showFolderOptions(folder) {
 
 async function moveFolderPrompt(path) {
     // Scan structure to get folders
-    const response = await fetch('/api/structure');
+    const response = await fetch('api/structure');
     const tree = await response.json();
 
     let folders = [];
@@ -444,7 +444,7 @@ async function moveFolderPrompt(path) {
 }
 
 async function confirmMoveFolder(oldPath, newParentPath) {
-    const response = await fetch('/api/move', {
+    const response = await fetch('api/move', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({old_path: oldPath, new_parent: newParentPath})
@@ -462,7 +462,7 @@ async function renameFolderPrompt(path) {
     const newName = prompt("Enter new name:");
     if (!newName) return;
 
-    const response = await fetch('/api/rename', {
+    const response = await fetch('api/rename', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({path, new_name: newName})
@@ -478,7 +478,7 @@ async function renameFolderPrompt(path) {
 
 async function deleteFolderPrompt(path) {
     if (confirm("Are you sure you want to delete this folder and all its contents?")) {
-        const response = await fetch('/api/delete', {
+        const response = await fetch('api/delete', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({path})
@@ -497,7 +497,7 @@ async function createNewFolderPrompt(parentPath) {
     const name = prompt("Enter folder name:");
     if (!name) return;
 
-    const response = await fetch('/api/create_folder', {
+    const response = await fetch('api/create_folder', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({parent_path: parentPath, name})
@@ -515,7 +515,7 @@ async function moveArticle() {
     if (!currentArticlePath) return;
 
     // Scan structure to get folders
-    const response = await fetch('/api/structure');
+    const response = await fetch('api/structure');
     const tree = await response.json();
 
     let folders = [];
@@ -539,7 +539,7 @@ async function moveArticle() {
 }
 
 async function confirmMoveArticle(newParentPath) {
-    const response = await fetch('/api/move', {
+    const response = await fetch('api/move', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({old_path: currentArticlePath, new_parent: newParentPath})
@@ -557,7 +557,7 @@ async function confirmMoveArticle(newParentPath) {
 }
 
 async function showArticleSelector(blockIndex) {
-    const response = await fetch('/api/articles');
+    const response = await fetch('api/articles');
     const articles = await response.json();
 
     let body = '<div style="max-height: 400px; overflow-y: auto;">';
@@ -608,7 +608,7 @@ function moveBlock(index, delta) {
 
 async function saveCurrentArticle() {
     try {
-        const response = await fetch('/api/article', {
+        const response = await fetch('api/article', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({path: currentArticlePath, content: currentArticleData})
@@ -637,7 +637,7 @@ function triggerUpload(blockIndex) {
         formData.append('article_path', currentArticlePath);
 
         try {
-            const response = await fetch('/api/upload_media', {
+            const response = await fetch('api/upload_media', {
                 method: 'POST',
                 body: formData
             });
@@ -663,7 +663,7 @@ async function createNewArticle() {
     const section = prompt("Enter section (optional, e.g. 'CategoryName'):", "");
 
     try {
-        const response = await fetch('/api/create_article', {
+        const response = await fetch('api/create_article', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({title, section})
@@ -686,7 +686,7 @@ async function init() {
 
     // Check if we should show the publishing button
     try {
-        const response = await fetch('/api/config');
+        const response = await fetch('api/config');
         const config = await response.json();
         if (config.is_server) {
             document.getElementById('publishing-btn').style.display = 'inline-block';
