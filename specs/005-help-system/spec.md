@@ -11,16 +11,22 @@ The Help System provides a centralized management hub for creating, editing, and
 
 ## Requirements
 - **Integrated Auth**: The Help Editor must be accessible only to authenticated users of the Nitto Lakewood Dash App.
-- **Content-Addressable Storage (CAS)**: Media and manifests must be stored using SHA-256 hashes to ensure deduplication and integrity.
-- **Blueprint Isolation**: The help system logic must be isolated in a Flask Blueprint to avoid interference with Dash components.
+- **Content-Addressable Storage (CAS)**: Media and manifests must be stored using SHA-256 hashes in the `blobs/`
+  directory to ensure deduplication and integrity.
+- **Path Normalization**: All internal article references and manifest entries must use paths relative to the
+  `help_content/` root, stripping legacy repository prefixes.
+- **Blueprint Isolation**: The help system logic must be isolated in a Flask Blueprint mounted at `/help` to avoid
+  interference with Dash components.
 - **Navigation Integration**: The editor must be reachable via the main application navigation menu.
+- **Dual-Database Support**: Versioning data must be stored in a dedicated `help_versions.db` using SQLAlchemy binds.
 
 ## Success Criteria
-- [ ] Admin can login and access `/help/editor`.
-- [ ] Articles can be created, edited, and saved.
-- [ ] Media can be uploaded and correctly referenced in articles.
-- [ ] Versions can be created, viewed in history, and published.
-- [ ] Diffs correctly identify added, modified, and removed files between versions.
+
+- [x] Admin can login and access `/help/editor`.
+- [x] Articles can be created, edited, and saved.
+- [x] Media can be uploaded and correctly referenced in articles.
+- [x] Versions can be created, viewed in history, and published.
+- [x] Diffs correctly identify added, modified, and removed files between versions.
 
 ## History Note
 This feature's implementation history was migrated from the `mahlo_popup` repository.

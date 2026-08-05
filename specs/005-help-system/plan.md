@@ -10,6 +10,21 @@
   - `CASManager`: Service for file-level versioning and deduplication.
   - `ContentVersion` & `BlobMetadata`: Database models for tracking state.
 
+## Data Strategy
+
+- **Dual Databases**:
+  - Main application uses `app.db` for user authentication.
+  - Help System uses `help_versions.db` for version history and blob metadata.
+- **SQLAlchemy Binds**: Configured via `SQLALCHEMY_BINDS` to allow seamless model integration while maintaining separate
+  storage files.
+- **Storage & Pathing**:
+  - JSON-based help articles and binary blobs are stored in `app/help_system/help_content/`.
+  - All paths in articles (images, videos, links) are normalized to be relative to the `help_content/` root.
+  - Legacy prefixes like `help_window/help_content/` are stripped during migration and enforced for new content.
+- **Media Serving**:
+  - Media is served via the `/help/media/<path>` route, which maps directly to the `help_content/` directory.
+  - This allows the editor preview to show "draft" content accurately.
+
 ## Implementation Phases
 
 ### Phase 1: Migration & Setup (Completed)

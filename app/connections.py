@@ -1,11 +1,11 @@
+import logging
+import pandas as pd
+import requests
 from datetime import datetime
 from traceback import format_exc
 from typing import List
 
-import pandas as pd
-import requests
-
-from __init__ import lg
+lg = logging.getLogger(__name__)
 from untracked_config.server_address import defects_list_address, operator_data_address
 
 

@@ -31,6 +31,7 @@ class ContentVersion(db.Model):
     """
     Represents a snapshot of the help content at a specific point in time.
     """
+    __bind_key__ = 'help_system'
     __tablename__ = 'content_versions'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -53,6 +54,7 @@ class BlobMetadata(db.Model):
     """
     Metadata for blobs stored in Content-Addressable Storage (CAS).
     """
+    __bind_key__ = 'help_system'
     __tablename__ = 'blob_metadata'
 
     sha256 = db.Column(db.String(64), primary_key=True)

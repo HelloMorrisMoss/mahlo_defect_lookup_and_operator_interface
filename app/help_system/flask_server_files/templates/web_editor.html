@@ -375,7 +375,8 @@
         <div style="display: flex; gap: 5px;">
             <button onclick="refreshArticleList()">Refresh</button>
             <button class="primary" onclick="createNewArticle()">New</button>
-            <button id="publishing-btn" style="display: none;" onclick="window.location.href='{{ url_for('help_system.versioning_page') }}'">Publishing
+            <button id="publishing-btn" onclick="window.location.href='{{ url_for('help_system.versioning_page') }}'">
+                Publishing
             </button>
         </div>
     </div>

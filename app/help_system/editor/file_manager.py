@@ -1,10 +1,8 @@
 import json
+import logging
 import os
 import shutil
 from typing import List, Dict
-
-from flask import current_app
-import logging
 
 lg = logging.getLogger(__name__)
 
@@ -77,12 +75,13 @@ def rename_resource(project_root: str, old_abs_path: str, new_name: str):
     if os.path.exists(new_abs_path):
         raise FileExistsError(f"Target path already exists: {new_abs_path}")
 
-    # Calculate relative paths for reference updates
+    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
+
+    # Calculate relative paths for reference updates (relative to help_content)
     try:
-        old_rel = os.path.relpath(old_abs_path, project_root).replace("\\", "/")
-        new_rel = os.path.relpath(new_abs_path, project_root).replace("\\", "/")
+        old_rel = os.path.relpath(old_abs_path, content_dir).replace("\\", "/")
+        new_rel = os.path.relpath(new_abs_path, content_dir).replace("\\", "/")
     except ValueError:
-        # Fallback if paths are on different drives or something
         old_rel = old_abs_path
         new_rel = new_abs_path
 
@@ -90,7 +89,6 @@ def rename_resource(project_root: str, old_abs_path: str, new_name: str):
     os.rename(old_abs_path, new_abs_path)
 
     # Update references in all articles
-    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
     update_all_references(content_dir, old_rel, new_rel)
 
     return new_abs_path
@@ -152,18 +150,17 @@ def get_media_dir(project_root: str, article_path: str) -> str:
 def upload_media(project_root: str, article_path: str, source_file: str) -> str:
     """
     Copies a source media file to the article's media directory.
-    Returns the path relative to the project root, using forward slashes.
+    Returns the path relative to help_content, using forward slashes.
     """
     media_dir = get_media_dir(project_root, article_path)
     filename = os.path.basename(source_file)
     dest_path = os.path.join(media_dir, filename)
 
-    # If file already exists and is different, we might want a suffix
-    # But for now, let's keep it simple.
     if os.path.abspath(source_file) != os.path.abspath(dest_path):
         shutil.copy2(source_file, dest_path)
 
-    rel_path = os.path.relpath(dest_path, project_root).replace("\\", "/")
+    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
+    rel_path = os.path.relpath(dest_path, content_dir).replace("\\", "/")
     return rel_path
 
 
@@ -182,10 +179,12 @@ def move_resource(project_root: str, old_abs_path: str, new_parent_dir: str):
     if os.path.exists(new_abs_path):
         raise FileExistsError(f"Target path already exists: {new_abs_path}")
 
-    # Calculate relative paths for reference updates
+    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
+
+    # Calculate relative paths for reference updates (relative to help_content)
     try:
-        old_rel = os.path.relpath(old_abs_path, project_root).replace("\\", "/")
-        new_rel = os.path.relpath(new_abs_path, project_root).replace("\\", "/")
+        old_rel = os.path.relpath(old_abs_path, content_dir).replace("\\", "/")
+        new_rel = os.path.relpath(new_abs_path, content_dir).replace("\\", "/")
     except ValueError:
         old_rel = old_abs_path
         new_rel = new_abs_path
@@ -194,7 +193,6 @@ def move_resource(project_root: str, old_abs_path: str, new_parent_dir: str):
     shutil.move(old_abs_path, new_abs_path)
 
     # Update references in all articles
-    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
     update_all_references(content_dir, old_rel, new_rel)
 
     return new_abs_path
@@ -208,20 +206,27 @@ def consolidate_article_media(project_root: str, article_path: str, data: List[D
     """
     changed = False
     new_data = []
+    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
 
     for block in data:
         new_block = block.copy()
         if block.get("type") in ["image", "video"]:
             content = block.get("content", "")
             if content:
-                # Get the absolute path of the current media
-                # Some paths might be already relative to project root
-                if os.path.isabs(content):
-                    abs_source = content
-                else:
-                    abs_source = os.path.abspath(os.path.join(project_root, content))
+                # Try finding it in help_content or project root
+                paths_to_try = [
+                    os.path.join(content_dir, content),
+                    os.path.join(project_root, content),
+                    content  # if absolute
+                ]
 
-                if os.path.exists(abs_source):
+                abs_source = None
+                for p in paths_to_try:
+                    if os.path.exists(p):
+                        abs_source = os.path.abspath(p)
+                        break
+
+                if abs_source:
                     # Upload it to the "correct" folder
                     new_rel_path = upload_media(project_root, article_path, abs_source)
                     if new_rel_path != content.replace("\\", "/"):

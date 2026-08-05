@@ -8,9 +8,9 @@ from config import BaseConfig
 from multipage_app import generate_dash_multipage_layout
 
 
-def create_app():
+def create_app(config_class=BaseConfig):
     server = Flask(__name__)
-    server.config.from_object(BaseConfig)
+    server.config.from_object(config_class)
 
     register_dashapps(server)
     register_extensions(server)

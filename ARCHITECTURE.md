@@ -11,9 +11,9 @@ Dash).
 - **Primary Language**: Python 3.11+
 - **Web Framework**: Flask (Backend) & Plotly Dash (Frontend/Interactive Dashboards)
 - **UI Components**: Dash Bootstrap Components (DBC) & Dash Ag-Grid
-- **Database**: SQLite (Local Authentication only)
+- **Database**: SQLite (Local Authentication and Help System versioning)
 - **External APIs**: Interacts with Mahlo popup server and other services for business data.
-- **ORM**: SQLAlchemy (via Flask-SQLAlchemy)
+- **ORM**: SQLAlchemy (via Flask-SQLAlchemy with multiple binds)
 - **Migrations**: Flask-Migrate (Alembic)
 - **Package Manager**: `uv`
 - **WSGI Server**: Waitress
@@ -40,9 +40,20 @@ Dash functionality is partitioned into sub-packages within the `app/` directory:
 - `app/operators_app/`: Logic and layout for operator management.
 - `app/pages/`: Multi-page registry for Dash `use_pages`.
 
-### 3. Data Integration Strategy
+### 3. Help System Blueprint
 
-- **Local Persistence**: User accounts and authentication data are stored in a local SQLite database (`app.db`).
+The application includes a Help System integrated as a Flask Blueprint (`/help`). This system provides:
+
+- **Article Editor**: A web-based interface for managing help content in JSON format.
+- **Versioning**: A Content-Addressable Storage (CAS) based versioning system for articles and media.
+- **Media Serving**: Dedicated routes for serving images and videos referenced in help articles.
+- **Authentication**: Secured via the same Flask-Login session as the rest of the application.
+
+### 4. Data Integration Strategy
+
+- **Local Persistence**:
+  - `app.db`: User accounts and authentication data.
+  - `help_versions.db`: Version history and metadata for the Help System (managed via SQLAlchemy binds).
 - **External Data**: Defect records and operator data are fetched dynamically from external REST APIs (defined in
   `app/connections.py`).
 - **Unified Interface**: Dash callbacks use `app.connections` to abstract the data source, whether it's local or remote.
@@ -56,6 +67,8 @@ Dash functionality is partitioned into sub-packages within the `app/` directory:
     - `models.py`: SQLAlchemy database models (User).
     - `extensions.py`: Initialized Flask extensions.
     - `connections.py`: Data fetchers for external APIs.
+  - `help_system/`: Flask Blueprint for the integrated Help System.
+    - `help_content/`: Storage for articles and media blobs.
     - `defects_app/`: Defect-specific Dash logic.
     - `operators_app/`: Operator-specific Dash logic.
     - `pages/`: Registry for Dash `use_pages`.

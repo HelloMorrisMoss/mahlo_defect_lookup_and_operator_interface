@@ -96,7 +96,7 @@ function toggleFolder(path) {
 async function loadArticle(path, title) {
     if (currentArticlePath) previousArticlePath = currentArticlePath;
     currentArticlePath = path;
-    const response = await fetch('api/article?path=${encodeURIComponent(path)}');
+    const response = await fetch(`api/article?path=${encodeURIComponent(path)}`);
     currentArticleData = await response.json();
 
     document.getElementById('current-article-name').textContent = title;
@@ -236,6 +236,11 @@ function renderEditor() {
     });
 }
 
+function getDisplayPath(path) {
+    if (!path) return "";
+    return path.replace('help_window/help_content/', '').replace('app/help_system/help_content/', '');
+}
+
 function renderPreview() {
     const preview = document.getElementById('preview-content');
     preview.innerHTML = '';
@@ -269,19 +274,27 @@ function renderPreview() {
             case 'image':
                 el = document.createElement('img');
                 el.className = 'preview-image';
-                // Remove help_window/help_content from the path if it's there
-                let src = block.content.replace('help_window/help_content/', '');
-                el.src = `/media/${src}`;
+                let src = getDisplayPath(block.content);
+                el.src = `media/${src}`;
                 break;
             case 'video':
-                el = document.createElement('div');
+                el = document.createElement('video');
                 el.className = 'preview-video';
-                el.textContent = `[Video Player: ${block.content}]`;
+                el.controls = true;
+                let vsrc = getDisplayPath(block.content);
+                el.src = `media/${vsrc}`;
                 break;
             case 'link':
                 el = document.createElement('a');
                 el.className = 'preview-link';
                 el.textContent = block.content;
+                let target = getDisplayPath(block.target);
+                el.onclick = (e) => {
+                    e.preventDefault();
+                    if (target) {
+                        loadArticle(target, block.content);
+                    }
+                };
                 el.href = '#';
                 break;
             case 'separator':
@@ -570,11 +583,8 @@ async function showArticleSelector(blockIndex) {
 }
 
 function selectArticleForLink(blockIndex, path) {
-    // Convert absolute path to relative if possible
-    // In our case, the help system expects relative paths from project root or relative to article
-    // The existing file_manager logic handles some of this.
-    // Let's just use the path as is, and maybe refine later.
-    currentArticleData[blockIndex].target = path;
+    // Strip prefixes to keep data clean
+    currentArticleData[blockIndex].target = getDisplayPath(path);
     hideModal();
     renderEditor();
     renderPreview();
@@ -683,17 +693,6 @@ async function createNewArticle() {
 // Initial load
 async function init() {
     await refreshArticleList();
-
-    // Check if we should show the publishing button
-    try {
-        const response = await fetch('api/config');
-        const config = await response.json();
-        if (config.is_server) {
-            document.getElementById('publishing-btn').style.display = 'inline-block';
-        }
-    } catch (e) {
-        console.error("Error fetching config:", e);
-    }
 }
 
 init();

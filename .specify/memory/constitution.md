@@ -41,6 +41,7 @@ scripts and `uv add` for new dependencies.
 
 - `app/`: Main application source.
 - `app/webapp.py`: Flask-specific routes and blueprints.
+- `app/help_system/`: Integrated help article management and versioning system.
 - `app/[sub_app]/`: Integrated Dash apps.
 - `migrations/`: Database migration scripts.
 - `untracked_config/`: Local configuration templates and overrides.
@@ -66,4 +67,4 @@ scripts and `uv add` for new dependencies.
 This constitution and the `ARCHITECTURE.md` file serve as the primary guidelines for development within this project.
 Amendments require documentation in `.specify/memory/` and updates to these files.
 
-**Version**: 1.0.2 | **Ratified**: 2026-08-05 | **Last Amended**: 2026-08-05
+**Version**: 1.0.3 | **Ratified**: 2026-08-05 | **Last Amended**: 2026-08-05

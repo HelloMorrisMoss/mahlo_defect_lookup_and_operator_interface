@@ -201,7 +201,9 @@
     <h1>Help Content Versioning</h1>
     <div class="actions">
         <button onclick="showCreateModal()">Create New Version</button>
-        <button class="secondary" onclick="window.location.href='/editor'">Back to Editor</button>
+        <button class="secondary" onclick="window.location.href='{{ url_for('help_system.web_editor') }}'">Back to
+            Editor
+        </button>
     </div>
 
     <table id="version-table">

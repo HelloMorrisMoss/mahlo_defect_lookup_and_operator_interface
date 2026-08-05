@@ -3,11 +3,12 @@
 register_operator_callbacks: function that registers the callbacks for the operator page.
 """
 
+import logging
 import pandas as pd
 import requests
 from dash import Output, Input, State
 
-from __init__ import lg
+lg = logging.getLogger(__name__)
 from app.connections import get_operator_data
 from app.operators_app.layout import empty_table_data
 from untracked_config.server_address import operator_data_address

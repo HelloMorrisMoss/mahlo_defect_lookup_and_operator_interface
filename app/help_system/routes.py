@@ -1,12 +1,15 @@
-import os
-import json
 import difflib
-from flask import render_template, jsonify, request, send_from_directory, abort, current_app
+import json
+import os
+from flask import render_template, jsonify, request, send_from_directory, current_app
 from flask_login import login_required
+
 from app.help_system import help_system_bp
+from app.help_system.editor.file_manager import upload_media, delete_resource, rename_resource, move_resource, \
+    consolidate_article_media
 from app.help_system.utils.cas_manager import CASManager
 from app.models import ContentVersion, db
-from app.help_system.editor.file_manager import upload_media, delete_resource, rename_resource, move_resource, consolidate_article_media
+
 
 # Initialize CASManager lazily or via a property
 def get_cas_manager():
@@ -36,7 +39,25 @@ def get_articles():
             dirs.remove("blobs")
         for file in files:
             if file.endswith(".json") and file != "manifest.json":
-                articles.append(to_rel(os.path.join(root, file)))
+                rel_path = to_rel(os.path.join(root, file))
+                abs_path = os.path.join(root, file)
+                title = "Untitled"
+                try:
+                    with open(abs_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        if isinstance(data, list) and len(data) > 0 and data[0]['type'] == 'title':
+                            title = data[0]['content']
+                except Exception:
+                    pass
+
+                section = os.path.dirname(rel_path).replace("\\", "/")
+                if section == ".": section = ""
+
+                articles.append({
+                    "file_path": rel_path,
+                    "title": title,
+                    "section": section
+                })
     return jsonify(articles)
 
 @help_system_bp.route('/api/structure')
@@ -187,7 +208,8 @@ def get_file_diff():
 def versioning_page():
     return render_template('versioning.html')
 
-@help_system_bp.route('/api/media/upload', methods=['POST'])
+
+@help_system_bp.route('/api/upload_media', methods=['POST'])
 @login_required
 def web_upload_media():
     article_path = request.form.get('article_path')
@@ -206,15 +228,15 @@ def web_upload_media():
     project_root = current_app.root_path
     try:
         rel_path = upload_media(project_root, to_abs(article_path), temp_path)
-        return jsonify({"path": rel_path})
+        return jsonify({"status": "success", "path": rel_path})
     finally:
         if os.path.exists(temp_path):
             os.remove(temp_path)
 
 @help_system_bp.route('/media/<path:filename>')
 def serve_media(filename):
-    cas_manager = get_cas_manager()
-    return send_from_directory(cas_manager.blobs_dir, filename)
+    content_dir = os.path.join(current_app.root_path, 'help_system', 'help_content')
+    return send_from_directory(content_dir, filename)
 
 @help_system_bp.route('/api/blob/<hash>')
 @login_required
@@ -225,10 +247,11 @@ def get_blob(hash):
         return send_from_directory(cas_manager.blobs_dir, hash)
     return jsonify({"error": "Blob not found"}), 404
 
-@help_system_bp.route('/api/media/list')
+
+@help_system_bp.route('/api/media_list')
 @login_required
 def get_media_list():
-    article_path = request.args.get('article_path')
+    article_path = request.args.get('path')
     project_root = current_app.root_path
     from app.help_system.editor.file_manager import get_media_dir
     media_dir = get_media_dir(project_root, to_abs(article_path))
@@ -237,17 +260,23 @@ def get_media_list():
         for file in os.listdir(media_dir):
             if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.mp4')):
                 rel_path = to_rel(os.path.join(media_dir, file))
-                media_files.append({"name": file, "path": rel_path})
+                media_files.append({
+                    "name": file,
+                    "path": rel_path,
+                    "url": f"media/{rel_path}"
+                })
     return jsonify(media_files)
 
-@help_system_bp.route('/api/folder', methods=['POST'])
+
+@help_system_bp.route('/api/create_folder', methods=['POST'])
 @login_required
 def create_folder():
     data = request.json
-    path = data.get('path')
-    abs_path = to_abs(path)
+    parent_path = data.get('parent_path', '')
+    name = data.get('name')
+    abs_path = os.path.join(to_abs(parent_path), name)
     os.makedirs(abs_path, exist_ok=True)
-    return jsonify({"success": True})
+    return jsonify({"success": True, "path": to_rel(abs_path)})
 
 @help_system_bp.route('/api/move', methods=['POST'])
 @login_required
@@ -255,19 +284,21 @@ def web_move_resource():
     data = request.json
     project_root = current_app.root_path
     old_abs = to_abs(data.get('old_path'))
-    new_parent_abs = to_abs(data.get('new_parent_path'))
+    new_parent_path = data.get('new_parent_path') or data.get('new_parent')
+    new_parent_abs = to_abs(new_parent_path)
     new_abs = move_resource(project_root, old_abs, new_parent_abs)
-    return jsonify({"new_path": to_rel(new_abs)})
+    return jsonify({"success": True, "new_path": to_rel(new_abs)})
 
 @help_system_bp.route('/api/rename', methods=['POST'])
 @login_required
 def web_rename_resource():
     data = request.json
     project_root = current_app.root_path
-    old_abs = to_abs(data.get('old_path'))
+    old_path = data.get('old_path') or data.get('path')
+    old_abs = to_abs(old_path)
     new_name = data.get('new_name')
     new_abs = rename_resource(project_root, old_abs, new_name)
-    return jsonify({"new_path": to_rel(new_abs)})
+    return jsonify({"success": True, "new_path": to_rel(new_abs)})
 
 @help_system_bp.route('/api/delete', methods=['POST'])
 @login_required
@@ -293,23 +324,37 @@ def web_consolidate():
             json.dump(new_data, f, indent=2)
     return jsonify({"success": True, "changed": changed})
 
-@help_system_bp.route('/api/article/create', methods=['POST'])
+
+@help_system_bp.route('/api/create_article', methods=['POST'])
 @login_required
 def create_article():
     data = request.json
-    path = data.get('path')
     title = data.get('title', 'New Article')
-    abs_path = to_abs(path)
-    if not abs_path.endswith('.json'):
-        abs_path += '.json'
+    section = data.get('section', '')
+
+    # Generate filename from title
+    import re
+    safe_title = re.sub(r'[^\w\s-]', '', title).strip().lower()
+    safe_title = re.sub(r'[-\s]+', '-', safe_title)
+    filename = f"{safe_title}.json"
+
+    rel_path = os.path.join(section, filename).replace("\\", "/")
+    abs_path = to_abs(rel_path)
+    
     if os.path.exists(abs_path):
-        return jsonify({"error": "Article already exists"}), 400
+        # Add a number if it exists
+        base, ext = os.path.splitext(rel_path)
+        i = 1
+        while os.path.exists(to_abs(f"{base}_{i}{ext}")):
+            i += 1
+        rel_path = f"{base}_{i}{ext}"
+        abs_path = to_abs(rel_path)
     
     os.makedirs(os.path.dirname(abs_path), exist_ok=True)
     initial_data = [
         {"type": "title", "content": title},
-        {"type": "text", "content": "Start writing your article here..."}
+        {"type": "paragraph", "content": "Start writing your article here..."}
     ]
     with open(abs_path, 'w', encoding='utf-8') as f:
         json.dump(initial_data, f, indent=2)
-    return jsonify({"success": True, "path": to_rel(abs_path)})
+    return jsonify({"success": True, "file_path": rel_path})

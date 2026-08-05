@@ -36,6 +36,12 @@ This project uses a modular monolith architecture. Development responsibilities 
 - **Responsibilities**: Logic and layout for the certificate lookup tool.
 - **Interactions**: Uses SQLAlchemy models from `app/models.py` and external connections.
 
+## 6. Help System Agent
+
+- **Ownership**: `app/help_system/`
+- **Responsibilities**: Management of help articles, media, and content versioning.
+- **Interactions**: Uses SQLAlchemy binds for `help_versions.db` and integrated auth from the Webapp Agent.
+
 ## Communication Rules
 
 - Sub-apps should remain decoupled from each other.
