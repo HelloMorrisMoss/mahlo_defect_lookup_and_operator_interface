@@ -42,7 +42,8 @@ Dash functionality is partitioned into sub-packages within the `app/` directory:
 
 ### 3. Help System Blueprint
 
-The application includes a Help System integrated as a Flask Blueprint (`/help`). This system provides:
+The application includes a Help System integrated as a Flask Blueprint (`/help`), refactored and migrated from the
+`mahlo-popup` project. This system provides:
 
 - **Article Editor**: A web-based interface for managing help content in JSON format.
 - **Versioning**: A Content-Addressable Storage (CAS) based versioning system for articles and media.
