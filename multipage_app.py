@@ -13,7 +13,8 @@ from untracked_config.laminator_popup_links import lam_addresses
 def create_navbar(*args, **kwargs):
     """Create the Dash navigation bar."""
 
-    lam_links = [dbc.DropdownMenuItem(name, href=address) for (name, address) in lam_addresses.items()]
+    lam_links = [dbc.DropdownMenuItem(name, href=address, external_link=True) for (name, address) in
+                 lam_addresses.items()]
 
     navbar = dbc.NavbarSimple(
         children=[
@@ -23,21 +24,18 @@ def create_navbar(*args, **kwargs):
                 label="Menu",
                 align_end=True,
                 children=[  # Add as many menu items as you need
-                    dbc.DropdownMenuItem("Home", href='/dashboard'),
+                    dbc.DropdownMenuItem("Home", href='/dashboard/'),
                     dbc.DropdownMenuItem(divider=True),
                     dbc.DropdownMenuItem("Defects Table", href='/dashboard/defects'),
                     dbc.DropdownMenuItem("Laminator Operators", href='/dashboard/operators'),
+                    dbc.DropdownMenuItem("Help System Editor", href='/help/editor', external_link=True),
                     *lam_links,
-                    dbc.Button(
-                        # dbc.NavLink(
-                        ["Logout"],
-                        href="/dashboard/logout",
-                    )
+                    dbc.DropdownMenuItem("Logout", href="/dashboard/logout/", external_link=True)
                 ],
             ),
             dcc.Link(
                 ["Logout"],
-                href="/dashboard/logout",
+                href="/dashboard/logout/",
                 className='nav-link',
                 target="_blank",
 
@@ -45,6 +43,7 @@ def create_navbar(*args, **kwargs):
         ],
         brand='Nitto',
         brand_href="/",
+        brand_external_link=True,
         color="dark",  # Change this to change color of the navbar e.g. "primary", "secondary" etc.
         dark=True,  # Change this to change color of text within the navbar (False for dark text)
     )

@@ -26,3 +26,5 @@ app.db
 /data_files/
 /dash_on_flask.egg-info/
 /mahlo_dash_app.log
+/app/help_system/help_content/
+/app/help_system/help_versions.db
