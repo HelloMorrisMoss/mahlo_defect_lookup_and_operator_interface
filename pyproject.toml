@@ -20,12 +20,17 @@ dependencies = [
     "pandas",
     "requests",
     "SQLAlchemy",
+]
+
+[dependency-groups]
+dev = [
     "pytest>=9.1.1",
     "pytest-flask>=1.3.0",
 ]
 
 [project.scripts]
 app-server = "dashapp:main"
+start = "dashapp:main"
 
 [tool.setuptools]
 packages = ["app"]

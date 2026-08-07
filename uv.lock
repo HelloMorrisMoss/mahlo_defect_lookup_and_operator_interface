@@ -170,12 +170,16 @@ dependencies = [
     { name = "gunicorn" },
     { name = "pandas" },
     { name = "pandas-datareader" },
-    { name = "pytest" },
-    { name = "pytest-flask" },
     { name = "python-dotenv" },
     { name = "requests" },
     { name = "sqlalchemy" },
     { name = "waitress" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-flask" },
 ]
 
 [package.metadata]
@@ -192,12 +196,16 @@ requires-dist = [
     { name = "gunicorn", specifier = ">=20.1.0" },
     { name = "pandas" },
     { name = "pandas-datareader", specifier = ">=0.9.0" },
-    { name = "pytest", specifier = ">=9.1.1" },
-    { name = "pytest-flask", specifier = ">=1.3.0" },
     { name = "python-dotenv", specifier = ">=0.17.1" },
     { name = "requests" },
     { name = "sqlalchemy" },
     { name = "waitress" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "pytest-flask", specifier = ">=1.3.0" },
 ]
 
 [[package]]
