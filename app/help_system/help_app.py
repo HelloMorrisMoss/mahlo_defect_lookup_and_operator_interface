@@ -4,15 +4,16 @@ import threading
 import tkinter as tk
 
 from flask_server_files.helpers import single_instance
-from help_window.flask_server_files.flask_app import start_flask_server
 from untracked_config.configuration_data import help_api_port
+
+from app.help_system.flask_server_files.flask_app import start_flask_server
 
 # Add parent directory to sys.path to allow importing from project root
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from dev_common import style_component
-from help_window.help_frame import HelpFrame
-from help_window.content_manager import ContentManager
+from app.help_system.help_frame import HelpFrame
+from app.help_system.content_manager import ContentManager
 
 
 class HelpApp(tk.Tk):

@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import os
 import shutil
 import threading
@@ -8,9 +9,9 @@ from typing import Dict, Optional, Callable
 
 import requests
 
-from help_window import lg
-from help_window.utils.cas_manager import get_data_hash
-from help_window.utils.config import get_settings
+logger = logging.getLogger(__name__)
+from app.help_system.utils.cas_manager import get_data_hash
+from app.help_system.utils.config import get_settings
 
 
 class SyncManager:
@@ -59,14 +60,14 @@ class SyncManager:
         self.running = False
 
     def _run(self):
-        lg.info(f"SyncManager started. Polling {self.server_url}")
+        logger.info(f"SyncManager started. Polling {self.server_url}")
         while self.running:
             try:
                 self._check_for_updates()
                 # Success, reset backoff
                 self.current_backoff = self.base_interval
             except Exception as e:
-                lg.error(f"Sync error: {e}. Backing off {self.current_backoff}s")
+                logger.error(f"Sync error: {e}. Backing off {self.current_backoff}s")
                 # Exponential backoff
                 time.sleep(self.current_backoff)
                 self.current_backoff = min(self.current_backoff * 2, self.max_backoff)
@@ -81,7 +82,7 @@ class SyncManager:
             new_hash = version_info.get("manifest_hash")
 
             if new_hash != self.current_version_hash:
-                lg.info(f"New version available: {new_hash} - old version: {self.current_version_hash}")
+                logger.info(f"New version available: {new_hash} - old version: {self.current_version_hash}")
                 if self._sync_version(new_hash):
                     if self.on_update_available:
                         self.on_update_available(new_hash)
@@ -106,14 +107,14 @@ class SyncManager:
             for rel_path, blob_hash in manifest.get("files", {}).items():
                 blob_path = os.path.join(self.blobs_dir, blob_hash)
                 if not os.path.exists(blob_path):
-                    lg.debug(f"Downloading blob {blob_hash} for {rel_path}")
+                    logger.debug(f"Downloading blob {blob_hash} for {rel_path}")
                     b_resp = requests.get(f"{self.server_url}/api/blob/{blob_hash}", timeout=30, stream=True)
                     if b_resp.status_code == 200:
                         with open(blob_path, "wb") as f:
                             for chunk in b_resp.iter_content(chunk_size=8192):
                                 f.write(chunk)
                     else:
-                        lg.error(f"Failed to download blob {blob_hash}")
+                        logger.error(f"Failed to download blob {blob_hash}")
                         return False
 
             # 3. Verify integrity (HLP-040)
@@ -126,7 +127,7 @@ class SyncManager:
 
             return False
         except Exception as e:
-            lg.error(f"Error during sync: {e}")
+            logger.error(f"Error during sync: {e}")
             return False
 
     def verify_manifest(self, manifest: Dict) -> bool:
@@ -137,7 +138,7 @@ class SyncManager:
                 return False
             # Optional: verify hash of downloaded file
             if get_file_hash(blob_path) != blob_hash:
-                lg.error(f"Integrity check failed for {rel_path} ({blob_hash})")
+                logger.error(f"Integrity check failed for {rel_path} ({blob_hash})")
                 return False
         return True
 
@@ -166,14 +167,14 @@ class SyncManager:
                     try:
                         shutil.copy2(blob_path, dest_path)
                     except Exception as e:
-                        lg.warning(f"Could not update {rel_path}: {e}")
+                        logger.warning(f"Could not update {rel_path}: {e}")
 
             # Finalize by moving manifest
             shutil.move(staging_manifest_path, os.path.join(self.content_dir, "manifest.json"))
             self.current_version_hash = self._load_current_version_hash()
             return True
         except Exception as e:
-            lg.error(f"Error applying update: {e}")
+            logger.error(f"Error applying update: {e}")
             return False
 
 

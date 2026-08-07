@@ -5,7 +5,7 @@ from dash.dependencies import Output
 
 from app.connections import get_defects
 
-lg = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(dashapp):

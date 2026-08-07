@@ -62,6 +62,7 @@ The application includes a Help System integrated as a Flask Blueprint (`/help`)
 ## Directory Structure
 
 - `dashapp.py`: Production entry point using Waitress.
+- `dash_on_flask.py`: Root module for logger setup and proxy configuration.
 - `app/`: Core application package.
     - `__init__.py`: App factory and Dash registration.
     - `webapp.py`: Flask blueprints and routes (Login, Register, Logout).
@@ -97,6 +98,22 @@ The application includes a Help System integrated as a Flask Blueprint (`/help`)
 - **Protected Views**: Dash views are wrapped with `login_required` during registration in `app/__init__.py`.
 - **Environment Variables**: Sensitive data (SECRET_KEY, DATABASE_URL) and API addresses are stored in `.env` and
   `untracked_config/`.
+
+## Logging & Monitoring
+
+The application uses a centralized logging strategy configured in `dash_on_flask.py`:
+
+- **Root Configuration**: The root logger is configured at startup using the `commonlog` library (or `basicConfig` as
+  fallback). This ensures all modules and third-party libraries (Waitress, Flask, etc.) use the same handlers.
+- **Handlers**: Logs are written to both the console (stdout) and a rolling file (`mahlo_dash_app.log`).
+- **Best Practices**: Modules should acquire loggers using `logger = logging.getLogger(__name__)`. This allows for
+  granular control over log levels and clear identification of the log source.
+
+## Legacy Components
+
+- **Tkinter (GUI)**: The `app/help_system/` directory contains legacy Tkinter-based components (e.g., `help_app.py`,
+  `help_frame.py`). These were part of a standalone desktop application and are currently deprecated in favor of the
+  integrated Flask Blueprint. They are scheduled for removal in future cleanup phases.
 
 ## Development Workflow
 

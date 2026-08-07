@@ -33,8 +33,8 @@ app-server = "dashapp:main"
 start = "dashapp:main"
 
 [tool.setuptools]
-packages = ["app"]
-py-modules = ["dashapp", "root_logger"]
+packages = ["app", "untracked_config"]
+py-modules = ["dashapp", "dash_on_flask", "config", "multipage_app"]
 
 [tool.uv]
 package = true

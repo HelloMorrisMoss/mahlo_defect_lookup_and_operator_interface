@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from traceback import format_exc
 from typing import List
@@ -5,14 +6,14 @@ from typing import List
 import pandas as pd
 import requests
 
-from __init__ import lg
+logger = logging.getLogger(__name__)
 from untracked_config.server_address import defects_list_address, operator_data_address
 
 
 def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.DataFrame:
     """Get the defect records within the date range from the database-service."""
 
-    lg.debug(f'{start_date=}, {end_date=}')
+    logger.debug(f'{start_date=}, {end_date=}')
     try:
         data = {
             'start_date': start_date.isoformat() if not isinstance(start_date, str) else start_date,
@@ -24,7 +25,7 @@ def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.Da
         defects_dict = response_dict['results_dict']
         defects_df = pd.DataFrame.from_dict(defects_dict).T
         if not len(defects_df):
-            lg.info('No records found')
+            logger.info('No records found')
             defects_df = pd.DataFrame.from_dict({'defect_data': ['No Records Found.']})
         else:
             defects_df = defects_df[defects_columns]
@@ -35,7 +36,7 @@ def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.Da
                         '1s')  # don't need milliseconds here and columns wind up too wide with empty space
         return defects_df
     except Exception:
-        lg.error(f'Error fetching defect data: {format_exc()}')
+        logger.error(f'Error fetching defect data: {format_exc()}')
         return pd.DataFrame.from_dict({'defect_data': ['failed to load']})
 
 

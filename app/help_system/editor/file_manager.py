@@ -4,7 +4,7 @@ import os
 import shutil
 from typing import List, Dict
 
-lg = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def update_all_references(content_dir: str, old_path: str, new_path: str):
@@ -26,7 +26,7 @@ def update_all_references(content_dir: str, old_path: str, new_path: str):
                     with open(file_path, 'r', encoding='utf-8') as f:
                         data = json.load(f)
                 except Exception as e:
-                    lg.error(f"Error reading {file_path} for reference update: {e}")
+                    logger.error(f"Error reading {file_path} for reference update: {e}")
                     continue
 
                 if not isinstance(data, list):
@@ -57,9 +57,9 @@ def update_all_references(content_dir: str, old_path: str, new_path: str):
                     try:
                         with open(file_path, 'w', encoding='utf-8') as f:
                             json.dump(data, f, indent=4)
-                        lg.info(f"Updated references in {file_path}")
+                        logger.info(f"Updated references in {file_path}")
                     except Exception as e:
-                        lg.error(f"Error writing {file_path} after reference update: {e}")
+                        logger.error(f"Error writing {file_path} after reference update: {e}")
 
 
 def rename_resource(project_root: str, old_abs_path: str, new_name: str):

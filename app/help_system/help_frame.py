@@ -3,9 +3,9 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Dict
 
-from help_window.article_viewer import ArticleViewer
-from help_window.content_manager import ContentManager
-from help_window.nav_frame import NavFrame
+from app.help_system.article_viewer import ArticleViewer
+from app.help_system.content_manager import ContentManager
+from app.help_system.nav_frame import NavFrame
 
 
 class HelpFrame(ttk.Frame):
@@ -91,9 +91,9 @@ class HelpFrame(ttk.Frame):
         self._update_window_behavior()
 
         # Start background update check
-        from help_window.utils.config import get_role
+        from app.help_system.utils.config import get_role
         if get_role() == "subscriber":
-            from help_window.sync_manager import SyncManager
+            from app.help_system.sync_manager import SyncManager
             self.sync_manager = SyncManager(self.content_manager.content_dir,
                                             on_update_available=self._on_sync_update,
                                             server_url=self.server_url)
@@ -182,7 +182,7 @@ class HelpFrame(ttk.Frame):
 
     def _open_editor(self):
         """Opens the help content editor."""
-        from help_window.editor.editor_manager import EditorManager
+        from app.help_system.editor.editor_manager import EditorManager
         EditorManager(self, self.content_manager, live_viewer=self.viewer)
 
     def _on_article_selected(self, article_meta: Dict):

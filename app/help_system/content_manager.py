@@ -1,8 +1,9 @@
 import json
+import logging
 import os
 from typing import List, Dict
 
-from help_window import lg
+logger = logging.getLogger(__name__)
 
 
 class ContentManager:
@@ -67,7 +68,7 @@ class ContentManager:
                 if os.path.exists(blob_path):
                     return blob_path
                 else:
-                    lg.debug(f"Manifest match for {search_path} -> {blob_hash}, but blob missing at {blob_path}")
+                    logger.debug(f"Manifest match for {search_path} -> {blob_hash}, but blob missing at {blob_path}")
 
         # Fallback to direct path in content_dir
         return os.path.join(self.content_dir, search_path)
@@ -82,7 +83,7 @@ class ContentManager:
 
         articles = []
         if not os.path.exists(self.content_dir):
-            lg.error(f"Content directory not found: {self.content_dir}")
+            logger.error(f"Content directory not found: {self.content_dir}")
             return articles
 
         for root, dirs, files in os.walk(self.content_dir):
@@ -136,7 +137,7 @@ class ContentManager:
                 "mtime": os.path.getmtime(file_path)
             }
         except Exception as e:
-            lg.error(f"Error parsing template {file_path}: {e}")
+            logger.error(f"Error parsing template {file_path}: {e}")
             return {
                 "title": os.path.basename(file_path),
                 "file_path": file_path,
@@ -153,7 +154,7 @@ class ContentManager:
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception as e:
-            lg.error(f"Error loading article {file_path}: {e}")
+            logger.error(f"Error loading article {file_path}: {e}")
             return [{"type": "header", "content": "Error"},
                     {"type": "paragraph", "content": "This article is broken. Please contact support."}]
 
@@ -165,7 +166,7 @@ class ContentManager:
             with open(self.cache_file, 'w', encoding='utf-8') as f:
                 json.dump(self.articles, f, indent=4)
         except Exception as e:
-            lg.error(f"Error saving cache: {e}")
+            logger.error(f"Error saving cache: {e}")
 
     def load_cache(self) -> bool:
         """
@@ -179,7 +180,7 @@ class ContentManager:
                 self.articles = json.load(f)
             return True
         except Exception as e:
-            lg.error(f"Error loading cache: {e}")
+            logger.error(f"Error loading cache: {e}")
             return False
 
     def check_for_updates(self) -> bool:
@@ -213,4 +214,4 @@ class ContentManager:
             with open(self.cache_file, 'w', encoding='utf-8') as f:
                 json.dump(articles, f, indent=4)
         except Exception as e:
-            lg.error(f"Error saving cache: {e}")
+            logger.error(f"Error saving cache: {e}")
