@@ -36,4 +36,4 @@ except ImportError:
         ]
     )
     lg = logging.getLogger()
-    lg.debug("Logging initialized on root logger with basicConfig.")
+    lg.info("Logging initialized on root logger with basicConfig.")
