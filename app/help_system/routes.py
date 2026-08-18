@@ -1,6 +1,7 @@
 import difflib
 import json
 import os
+
 from flask import render_template, jsonify, request, send_from_directory, current_app
 from flask_login import login_required
 
@@ -37,16 +38,24 @@ def get_articles():
     for root, dirs, files in os.walk(content_dir):
         if "blobs" in dirs:
             dirs.remove("blobs")
+        if "staging" in dirs:
+            dirs.remove("staging")
+            
         for file in files:
             if file.endswith(".json") and file != "manifest.json":
                 rel_path = to_rel(os.path.join(root, file))
                 abs_path = os.path.join(root, file)
                 title = "Untitled"
+                icon = None
                 try:
                     with open(abs_path, 'r', encoding='utf-8') as f:
                         data = json.load(f)
-                        if isinstance(data, list) and len(data) > 0 and data[0]['type'] == 'title':
-                            title = data[0]['content']
+                        if isinstance(data, list) and len(data) > 0:
+                            for block in data:
+                                if block.get('type') == 'title':
+                                    title = block.get('content', 'Untitled')
+                                elif block.get('type') == 'icon':
+                                    icon = block.get('content')
                 except Exception:
                     pass
 
@@ -56,6 +65,7 @@ def get_articles():
                 articles.append({
                     "file_path": rel_path,
                     "title": title,
+                    "icon": icon,
                     "section": section
                 })
     return jsonify(articles)
@@ -65,24 +75,69 @@ def get_articles():
 def get_structure():
     content_dir = os.path.join(current_app.root_path, 'help_system', 'help_content')
     def build_tree(current_dir):
-        tree = {"name": os.path.basename(current_dir), "type": "folder", "children": [], "path": to_rel(current_dir)}
+        node_name = os.path.basename(current_dir) or "Root"
+        tree = {
+            "name": node_name,
+            "type": "folder",
+            "children": [],
+            "path": to_rel(current_dir),
+            "is_media": node_name == "media"
+        }
+
+        if tree["is_media"]:
+            try:
+                tree["item_count"] = len(
+                    [f for f in os.listdir(current_dir) if os.path.isfile(os.path.join(current_dir, f))])
+            except Exception:
+                tree["item_count"] = 0
+
         try:
             items = os.listdir(current_dir)
         except Exception:
             return tree
         
         for item in items:
-            if item in ["blobs", "manifest.json"] or item.endswith(".lock"):
+            if item in ["blobs", "manifest.json", "staging"] or item.endswith(".lock"):
                 continue
             abs_path = os.path.join(current_dir, item)
             if os.path.isdir(abs_path):
                 tree["children"].append(build_tree(abs_path))
             else:
-                tree["children"].append({
-                    "name": item,
-                    "type": "article" if item.endswith(".json") else "media",
-                    "path": to_rel(abs_path)
-                })
+                if not item.endswith(".json"):
+                    ext = item.lower().split('.')[-1]
+                    media_type = "media"
+                    if ext in ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp']:
+                        media_type = "image"
+                    elif ext in ['mp4', 'webm', 'ogg', 'mov', 'avi']:
+                        media_type = "video"
+
+                    tree["children"].append({
+                        "name": item,
+                        "type": media_type,
+                        "path": to_rel(abs_path)
+                    })
+                else:
+                    # Extract title and icon from article
+                    title = item
+                    icon = None
+                    try:
+                        with open(abs_path, 'r', encoding='utf-8') as f:
+                            data = json.load(f)
+                            if isinstance(data, list):
+                                for block in data:
+                                    if block.get('type') == 'title':
+                                        title = block.get('content', item)
+                                    elif block.get('type') == 'icon':
+                                        icon = block.get('content')
+                    except Exception:
+                        pass
+
+                    tree["children"].append({
+                        "name": title,
+                        "type": "article",
+                        "icon": icon,
+                        "path": to_rel(abs_path)
+                    })
         return tree
     
     return jsonify(build_tree(content_dir))

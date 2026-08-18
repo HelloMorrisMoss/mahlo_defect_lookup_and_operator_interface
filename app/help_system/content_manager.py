@@ -87,6 +87,11 @@ class ContentManager:
             return articles
 
         for root, dirs, files in os.walk(self.content_dir):
+            if "blobs" in dirs:
+                dirs.remove("blobs")
+            if "staging" in dirs:
+                dirs.remove("staging")
+            
             # Calculate section header from relative folder name
             rel_path = os.path.relpath(root, self.content_dir)
             section = "" if rel_path == "." else rel_path
@@ -112,14 +117,17 @@ class ContentManager:
                 data = json.load(f)
 
             title = "Untitled"
+            icon = None
             is_broken = False
 
             if isinstance(data, list) and len(data) > 0:
                 for block in data:
                     if block.get("type") == "title":
                         title = block.get("content", "Untitled")
-                        break
-                else:
+                    elif block.get("type") == "icon":
+                        icon = block.get("content")
+
+                if title == "Untitled":
                     # Fallback to first header if no title block found
                     for block in data:
                         if block.get("type") == "header":
@@ -131,6 +139,7 @@ class ContentManager:
 
             return {
                 "title": title,
+                "icon": icon,
                 "file_path": file_path,
                 "section": section,
                 "is_broken": is_broken,

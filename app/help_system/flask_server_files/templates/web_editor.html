@@ -62,6 +62,11 @@
             color: white;
         }
 
+        .article-item.media-selected {
+            border: 2px solid #0078d4;
+            padding: 3px;
+        }
+
         .article-icon {
             margin-right: 5px;
             width: 16px;
@@ -98,6 +103,17 @@
 
         .folder-item:hover {
             background: #ddd;
+        }
+
+        .folder-edit-icon {
+            display: none;
+            cursor: pointer;
+            padding: 0 5px;
+            margin-left: auto;
+        }
+
+        .folder-item:hover .folder-edit-icon {
+            display: inline-block;
         }
 
         .folder-item.media-folder {
@@ -262,6 +278,93 @@
             cursor: pointer;
         }
 
+        #media-preview-container {
+            flex: 1;
+            border-top: 2px solid var(--border-color);
+            position: relative;
+            background: #eee;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+
+        #media-preview-container:hover .media-preview-close {
+            display: block;
+        }
+
+        .media-preview-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+            font-weight: bold;
+        }
+
+        .media-preview-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        #media-preview-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        #media-preview-content img, #media-preview-content video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Selection Popup Styles */
+        #selection-popup {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            border: 1px solid #0078d4;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            display: none;
+            min-width: 300px;
+        }
+
+        #selection-popup h3 {
+            margin-top: 0;
+            font-size: 14px;
+            color: #0078d4;
+        }
+
+        #selection-popup .path-display {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 5px;
+            margin: 10px 0;
+            word-break: break-all;
+            font-size: 12px;
+        }
+
+        #selection-popup .error-message {
+            color: #d13438;
+            font-size: 12px;
+            margin: 10px 0;
+            display: none;
+        }
+
         /* Modal styles */
         #modal-overlay {
             position: fixed;
@@ -414,6 +517,21 @@
     </div>
     <div id="preview-content">
         <!-- Rendered via JS -->
+    </div>
+    <div id="media-preview-container">
+        <div class="media-preview-close" onclick="closeMediaPreview()">&times;</div>
+        <div id="media-preview-content"></div>
+    </div>
+</div>
+
+<div id="selection-popup">
+    <h3 id="selection-popup-title">Select Media</h3>
+    <div id="selection-popup-message">Please select a file from the tree.</div>
+    <div id="selection-path-display" class="path-display">No file selected</div>
+    <div id="selection-error" class="error-message"></div>
+    <div style="display: flex; justify-content: flex-end; gap: 5px; margin-top: 10px;">
+        <button id="selection-ok-btn" class="primary" style="display: none;">OK</button>
+        <button onclick="cancelMediaSelection()">Cancel</button>
     </div>
 </div>
 

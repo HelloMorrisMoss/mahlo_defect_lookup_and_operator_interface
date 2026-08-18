@@ -4,14 +4,14 @@ import os
 from functools import wraps
 
 from flask import Flask, jsonify, render_template, request, send_from_directory, abort
+from untracked_config.configuration_data import help_api_port, ON_DEV_NODE
 from werkzeug.utils import secure_filename
 
-from help_window.editor.file_manager import upload_media, delete_resource, rename_resource, move_resource, \
+from app.help_system.editor.file_manager import upload_media, delete_resource, rename_resource, move_resource, \
     consolidate_article_media
-from help_window.flask_server_files.models.version import db, ContentVersion
-from help_window.utils.cas_manager import CASManager
-from help_window.utils.config import get_settings, is_server
-from untracked_config.configuration_data import help_api_port, ON_DEV_NODE
+from app.help_system.utils.cas_manager import CASManager
+from app.help_system.utils.config import get_settings, is_server
+from app.models import db, ContentVersion
 
 
 def require_auth(f):
@@ -88,6 +88,7 @@ def create_app(app_instance):
         for a in articles:
             web_articles.append({
                 "title": a["title"],
+                "icon": a.get("icon"),
                 "section": a["section"],
                 "file_path": to_rel(a["file_path"]),
                 "is_broken": a["is_broken"]
@@ -114,18 +115,40 @@ def create_app(app_instance):
             try:
                 for entry in os.scandir(current_dir):
                     if entry.is_dir():
+                        if entry.name == "staging":
+                            continue
                         node["children"].append(build_tree(entry.path))
-                    elif entry.is_file() and entry.name.endswith(".json"):
-                        # Get title from ContentManager if possible
-                        article = next(
-                            (a for a in app_instance.content_manager.articles if a["file_path"] == entry.path), None)
-                        title = article["title"] if article else entry.name
-                        node["children"].append({
-                            "name": title,
-                            "path": entry.path,
-                            "type": "article",
-                            "is_broken": article["is_broken"] if article else False
-                        })
+                    elif entry.is_file():
+                        if entry.name == "manifest.json" or entry.name.endswith(".lock"):
+                            continue
+
+                        if not entry.name.endswith(".json"):
+                            ext = entry.name.lower().split('.')[-1]
+                            media_type = "media"
+                            if ext in ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp']:
+                                media_type = "image"
+                            elif ext in ['mp4', 'webm', 'ogg', 'mov', 'avi']:
+                                media_type = "video"
+
+                            node["children"].append({
+                                "name": entry.name,
+                                "path": entry.path,
+                                "type": media_type,
+                                "is_broken": False
+                            })
+                        else:
+                            # Get title from ContentManager if possible
+                            article = next(
+                                (a for a in app_instance.content_manager.articles if a["file_path"] == entry.path),
+                                None)
+                            title = article["title"] if article else entry.name
+                            node["children"].append({
+                                "name": title,
+                                "path": entry.path,
+                                "type": "article",
+                                "icon": article.get("icon") if article else None,
+                                "is_broken": article["is_broken"] if article else False
+                            })
             except Exception as e:
                 print(f"Error building tree for {current_dir}: {e}")
 

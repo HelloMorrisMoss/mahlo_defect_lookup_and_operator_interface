@@ -1,5 +1,24 @@
 # Tasks: Help System Migration
 
+## Implementation Polish (Refined 2026-08-18)
+
+- [x] Default article icon changed to "ℹ️".
+- [x] Image icon "📷" and Video icon "🎥" added for media files in the tree view.
+- [x] Custom "icon" block support added to editor and backend.
+- [x] "Add Icon" button in `add-block-toolbar`.
+- [x] Folder "pencil" icon for options popup (sticky right, visible on hover).
+- [x] Folder name/triangle both toggle expansion.
+- [x] `staging` folder hidden from tree view.
+- [x] Image block: right-aligned buttons + "Select Existing Media".
+- [x] Image block: path input flex fill.
+- [x] Split-pane media preview in `preview-pane`.
+- [x] On-hover close button for media preview.
+- [x] Border highlight for selected media in tree.
+- [x] Tree-based media selection popup (non-modal).
+- [x] Media type validation in selection workflow.
+- [x] Refactor link block article selection to use tree-integrated workflow.
+- [x] Rename link block "Browse..." button to "Select...".
+
 ## Migration
 - [x] Create feature branch `feature/migrate-help-system`.
 - [x] Extract `help_window` history via `git subtree split`.
@@ -33,8 +52,9 @@
 - [x] Manual test: Verify images and videos render correctly in preview.
 - [x] Manual test: Verify article links in preview are functional.
 - [x] Manual test: Verify "Publishing" button is visible in the sidebar header.
-- [ ] Manual test: Create a "Test Article" and save it.
-- [ ] Manual test: Upload an image to the "Test Article".
-- [ ] Manual test: Create a content version with a comment.
-- [ ] Manual test: Verify the diff shows the new article and image.
-- [ ] Manual test: Publish the new version.
+- [x] Manual test: Create a "Test Article" and save it.
+- [x] Manual test: Upload an image to the "Test Article".
+- [x] Manual test: Create a content version with a comment.
+- [x] Manual test: Verify the diff shows the new article and image.
+- [x] Manual test: Publish the new version.
+- [x] Manual test: Verify tree-based link selection works and updates block.

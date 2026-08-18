@@ -1,5 +1,7 @@
 # Plan: Help System Migration & Integration
 
+**Refined: 2026-08-18 — UI/UX Polish & Link Selection Refactor**
+
 ## Architecture
 - **Flask Blueprint**: `app.help_system` registered at `/help`.
 - **UI**: 
@@ -9,6 +11,26 @@
   - `routes.py`: Controller logic for APIs and view rendering.
   - `CASManager`: Service for file-level versioning and deduplication.
   - `ContentVersion` & `BlobMetadata`: Database models for tracking state.
+
+## UI/UX Enhancements (Refined 2026-08-18)
+
+- **Article Icons**: Default to "ℹ️", images to "📷", videos to "🎥", customizable via "icon" block.
+- **Tree View**:
+  - Pencil icon for folder options (sticky right, visible on hover).
+  - Click folder name/triangle to toggle expansion.
+  - Hide `staging` folder.
+- **Image Editor**:
+  - Right-aligned buttons.
+  - "Select Existing Media" option.
+  - Responsive path input.
+- **Media Preview (New)**:
+  - Split-pane layout for image/video preview in the editor.
+  - Border highlight for selected media in the tree.
+  - Integrated close button for media preview.
+- **Tree-based Media & Link Selection (Refined 2026-08-18)**:
+  - Interactive tree selection for block media paths and article links.
+  - Non-modal popup for validation and confirmation.
+  - Link block "Browse..." button renamed to "Select...".
 
 ## Data Strategy
 
@@ -43,7 +65,19 @@
 - [x] Register Blueprint in `app/__init__.py`.
 - [x] Add "Help System Editor" to Dash navigation.
 
-### Phase 4: Verification
-- [ ] Run the application and verify login access.
-- [ ] Test the full article lifecycle (Create -> Edit -> Save -> Media Upload).
-- [ ] Test the versioning lifecycle (Create Version -> Diff -> Publish).
+### Phase 4: Verification (Completed)
+
+- [x] Run the application and verify login access.
+- [x] Test the full article lifecycle (Create -> Edit -> Save -> Media Upload).
+- [x] Test the versioning lifecycle (Create Version -> Diff -> Publish).
+- [x] Verify split-pane media preview.
+- [x] Verify tree-based media selection for blocks.
+
+### Phase 5: Media & Link Experience Refinement (Refined 2026-08-18)
+
+- [x] Implement split preview container in `web_editor.html`.
+- [x] Implement tree item border highlight for media.
+- [x] Implement media selection state machine in `web_editor.js`.
+- [x] Replace modal media selector with tree-integrated workflow.
+- [x] Refactor link block article selection to use tree-integrated workflow.
+- [x] Update link block UI text to "Select...".

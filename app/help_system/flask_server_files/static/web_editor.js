@@ -2,6 +2,10 @@ let currentArticlePath = null;
 let currentArticleData = [];
 let previousArticlePath = null;
 let expandedFolders = new Set(["Root"]); // Root expanded by default
+let previewedMediaPath = null;
+let isSelectingForBlock = false;
+let selectionBlockIndex = -1;
+let selectionType = ''; // 'image', 'video', or 'article'
 
 async function refreshArticleList() {
     const response = await fetch('api/structure');
@@ -35,21 +39,18 @@ function renderTreeNode(node) {
 
         const toggleIcon = isExpanded ? '▼' : '▶';
         const folderIcon = node.is_media ? '📁' : (isExpanded ? '📂' : '📁');
+        const editIcon = `<span class="folder-edit-icon" title="Folder Options">✏️</span>`;
 
-        header.innerHTML = `<span class="article-icon" style="cursor:pointer; width: 10px; display: inline-block;">${node.is_media ? '' : toggleIcon}</span> <span class="article-icon">${folderIcon}</span> ${label}`;
+        header.innerHTML = `<span class="article-icon" style="cursor:pointer; width: 10px; display: inline-block;">${toggleIcon}</span> <span class="article-icon">${folderIcon}</span> ${label}${editIcon}`;
         
         header.onclick = (e) => {
             e.stopPropagation();
-            if (e.target.innerText === '▶' || e.target.innerText === '▼' || (!node.is_media && e.detail > 1)) {
-                toggleFolder(node.path);
+            if (e.target.classList.contains('folder-edit-icon')) {
+                showFolderOptions(node);
                 return;
             }
 
-            if (node.is_media) {
-                showMediaBrowser(node.path);
-            } else {
-                showFolderOptions(node);
-            }
+            toggleFolder(node.path);
         };
         div.appendChild(header);
 
@@ -72,10 +73,18 @@ function renderTreeNode(node) {
         item.className = 'article-item';
         item.dataset.path = node.path;
         if (node.path === currentArticlePath) item.classList.add('selected');
-        item.innerHTML = `<span class="article-icon">📄</span> ${node.name}`;
+        if (node.path === previewedMediaPath) item.classList.add('media-selected');
+        let icon = node.icon;
+        if (!icon) {
+            if (node.type === 'article') icon = 'ℹ️';
+            else if (node.type === 'image') icon = '📷';
+            else if (node.type === 'video') icon = '🎥';
+            else icon = '📄';
+        }
+        item.innerHTML = `<span class="article-icon">${icon}</span> ${node.name}`;
         item.onclick = (e) => {
             e.stopPropagation();
-            loadArticle(node.path, node.name);
+            handleTreeItemClick(node, item);
         };
         div.appendChild(item);
     }
@@ -91,6 +100,130 @@ function toggleFolder(path) {
     // We don't need to fetch from server just to toggle UI, but refreshArticleList does that.
     // For now, let's just re-render from local state if we had it, but refresh is safer.
     refreshArticleList();
+}
+
+function handleTreeItemClick(node, element) {
+    if (isSelectingForBlock) {
+        handleSelectionClick(node, element);
+        return;
+    }
+
+    if (node.type === 'article') {
+        loadArticle(node.path, node.name);
+    } else if (node.type === 'image' || node.type === 'video') {
+        showMediaPreview(node);
+    }
+}
+
+function showMediaPreview(node) {
+    previewedMediaPath = node.path;
+
+    // Update UI highlights
+    document.querySelectorAll('.article-item').forEach(el => {
+        el.classList.toggle('media-selected', el.dataset.path === node.path);
+    });
+
+    const container = document.getElementById('media-preview-container');
+    const content = document.getElementById('media-preview-content');
+    container.style.display = 'flex';
+
+    const src = `media/${getDisplayPath(node.path)}`;
+    if (node.type === 'image') {
+        content.innerHTML = `<img src="${src}">`;
+    } else if (node.type === 'video') {
+        content.innerHTML = `<video src="${src}" controls autoplay></video>`;
+    }
+}
+
+function closeMediaPreview() {
+    previewedMediaPath = null;
+    document.getElementById('media-preview-container').style.display = 'none';
+    document.querySelectorAll('.article-item').forEach(el => {
+        el.classList.remove('media-selected');
+    });
+}
+
+function showMediaSelectorForBlock(blockIndex) {
+    const block = currentArticleData[blockIndex];
+    isSelectingForBlock = true;
+    selectionBlockIndex = blockIndex;
+    selectionType = block.type; // 'image' or 'video'
+
+    const popup = document.getElementById('selection-popup');
+    const title = document.getElementById('selection-popup-title');
+    const msg = document.getElementById('selection-popup-message');
+    const error = document.getElementById('selection-error');
+    const pathDisplay = document.getElementById('selection-path-display');
+    const okBtn = document.getElementById('selection-ok-btn');
+
+    title.textContent = `Select ${selectionType.charAt(0).toUpperCase() + selectionType.slice(1)}`;
+    msg.textContent = `Please click an ${selectionType} in the tree navigation.`;
+    error.style.display = 'none';
+    pathDisplay.textContent = 'No file selected';
+    okBtn.style.display = 'none';
+    popup.style.display = 'block';
+}
+
+function showLinkSelectorForBlock(blockIndex) {
+    isSelectingForBlock = true;
+    selectionBlockIndex = blockIndex;
+    selectionType = 'article';
+
+    const popup = document.getElementById('selection-popup');
+    const title = document.getElementById('selection-popup-title');
+    const msg = document.getElementById('selection-popup-message');
+    const error = document.getElementById('selection-error');
+    const pathDisplay = document.getElementById('selection-path-display');
+    const okBtn = document.getElementById('selection-ok-btn');
+
+    title.textContent = 'Select Target Article';
+    msg.textContent = 'Please click an article in the tree navigation.';
+    error.style.display = 'none';
+    pathDisplay.textContent = 'No article selected';
+    okBtn.style.display = 'none';
+    popup.style.display = 'block';
+}
+
+function handleSelectionClick(node, element) {
+    const error = document.getElementById('selection-error');
+    const pathDisplay = document.getElementById('selection-path-display');
+    const okBtn = document.getElementById('selection-ok-btn');
+
+    if (node.type !== selectionType) {
+        error.textContent = `Must be an ${selectionType}. Selected: ${node.type}`;
+        error.style.display = 'block';
+        pathDisplay.textContent = 'Invalid selection';
+        okBtn.style.display = 'none';
+        return;
+    }
+
+    error.style.display = 'none';
+    pathDisplay.textContent = getDisplayPath(node.path);
+    okBtn.style.display = 'inline-block';
+    okBtn.onclick = () => confirmSelection(node.path);
+
+    // Also show preview while selecting if it's media
+    if (node.type === 'image' || node.type === 'video') {
+        showMediaPreview(node);
+    }
+}
+
+function confirmSelection(path) {
+    if (selectionType === 'article') {
+        currentArticleData[selectionBlockIndex].target = getDisplayPath(path);
+    } else {
+        currentArticleData[selectionBlockIndex].content = path;
+    }
+    cancelSelection();
+    renderEditor();
+    renderPreview();
+}
+
+function cancelSelection() {
+    isSelectingForBlock = false;
+    selectionBlockIndex = -1;
+    selectionType = '';
+    document.getElementById('selection-popup').style.display = 'none';
 }
 
 async function loadArticle(path, title) {
@@ -109,6 +242,7 @@ async function loadArticle(path, title) {
     // Highlight in list
     document.querySelectorAll('#article-list .article-item').forEach(item => {
         item.classList.toggle('selected', item.dataset.path === path);
+        item.classList.toggle('media-selected', item.dataset.path === previewedMediaPath);
     });
 
     renderEditor();
@@ -118,7 +252,7 @@ async function loadArticle(path, title) {
 function renderAddBlockToolbar() {
     const toolbar = document.getElementById('add-block-toolbar');
     toolbar.innerHTML = '';
-    const types = ["title", "header", "subheader", "paragraph", "image", "video", "link", "separator"];
+    const types = ["title", "icon", "header", "subheader", "paragraph", "image", "video", "link", "separator"];
     types.forEach(t => {
         const btn = document.createElement('button');
         btn.textContent = t.charAt(0).toUpperCase() + t.slice(1);
@@ -132,10 +266,14 @@ function addSpecificBlock(type) {
         alert("Article already has a title block.");
         return;
     }
+    if (type === 'icon' && currentArticleData.some(b => b.type === 'icon')) {
+        alert("Article already has an icon block.");
+        return;
+    }
     const newBlock = {type: type, content: ''};
     if (type === 'link') newBlock.target = '';
-    if (type === 'title') {
-        // Titles must be at the top
+    if (type === 'title' || type === 'icon') {
+        // Metadata blocks at the top
         currentArticleData.unshift(newBlock);
     } else {
         currentArticleData.push(newBlock);
@@ -167,21 +305,33 @@ function renderEditor() {
         div.appendChild(controls);
 
         if (block.type === 'image' || block.type === 'video') {
+            const entryRow = document.createElement('div');
+            entryRow.style.display = 'flex';
+            entryRow.style.gap = '5px';
+            entryRow.style.marginBottom = '5px';
+
             const input = document.createElement('input');
             input.type = 'text';
             input.value = block.content;
             input.placeholder = 'Path to media...';
-            input.style.marginBottom = '5px';
+            input.style.flex = '1';
             input.oninput = (e) => {
                 block.content = e.target.value;
                 renderPreview();
             };
-            div.appendChild(input);
+            entryRow.appendChild(input);
+
+            const selectBtn = document.createElement('button');
+            selectBtn.textContent = 'Select Existing Media';
+            selectBtn.onclick = () => showMediaSelectorForBlock(index);
+            entryRow.appendChild(selectBtn);
 
             const uploadBtn = document.createElement('button');
             uploadBtn.textContent = 'Upload Media...';
             uploadBtn.onclick = () => triggerUpload(index);
-            div.appendChild(uploadBtn);
+            entryRow.appendChild(uploadBtn);
+
+            div.appendChild(entryRow);
         } else if (block.type === 'link') {
             const input = document.createElement('input');
             input.type = 'text';
@@ -209,10 +359,10 @@ function renderEditor() {
             };
             targetContainer.appendChild(targetInput);
 
-            const browseBtn = document.createElement('button');
-            browseBtn.textContent = 'Browse...';
-            browseBtn.onclick = () => showArticleSelector(index);
-            targetContainer.appendChild(browseBtn);
+            const selectBtn = document.createElement('button');
+            selectBtn.textContent = 'Select...';
+            selectBtn.onclick = () => showLinkSelectorForBlock(index);
+            targetContainer.appendChild(selectBtn);
 
             div.appendChild(targetContainer);
         } else if (block.type === 'separator') {
@@ -255,6 +405,10 @@ function renderPreview() {
                 el.className = 'preview-title';
                 el.textContent = block.content;
                 el.style.display = 'block';
+                break;
+            case 'icon':
+                // Icon metadata not visible in article
+                el = null;
                 break;
             case 'header':
                 el = document.createElement('h2');
@@ -569,27 +723,6 @@ async function confirmMoveArticle(newParentPath) {
     }
 }
 
-async function showArticleSelector(blockIndex) {
-    const response = await fetch('api/articles');
-    const articles = await response.json();
-
-    let body = '<div style="max-height: 400px; overflow-y: auto;">';
-    articles.forEach(a => {
-        body += `<div class="article-item" onclick="selectArticleForLink(${blockIndex}, ${esc(a.file_path)})">${a.title} (${a.section || 'Root'})</div>`;
-    });
-    body += '</div>';
-
-    showModal('Select Target Article', body);
-}
-
-function selectArticleForLink(blockIndex, path) {
-    // Strip prefixes to keep data clean
-    currentArticleData[blockIndex].target = getDisplayPath(path);
-    hideModal();
-    renderEditor();
-    renderPreview();
-}
-
 function removeBlock(index) {
     if (currentArticleData[index].type === 'title') {
         alert("Cannot delete mandatory title block.");
@@ -606,8 +739,9 @@ function moveBlock(index, delta) {
     const newIndex = index + delta;
     if (newIndex < 0 || newIndex >= currentArticleData.length) return;
 
-    // Title block must stay at index 0
-    if (index === 0 || newIndex === 0) return;
+    // Title and Icon blocks must stay at the top
+    if (currentArticleData[index].type === 'title' || currentArticleData[index].type === 'icon') return;
+    if (currentArticleData[newIndex].type === 'title' || currentArticleData[newIndex].type === 'icon') return;
 
     const temp = currentArticleData[index];
     currentArticleData[index] = currentArticleData[newIndex];
