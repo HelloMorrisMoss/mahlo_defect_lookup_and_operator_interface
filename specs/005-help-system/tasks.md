@@ -18,6 +18,13 @@
 - [x] Media type validation in selection workflow.
 - [x] Refactor link block article selection to use tree-integrated workflow.
 - [x] Rename link block "Browse..." button to "Select...".
+- [x] Generalize tree selection state in `web_editor.js`.
+- [x] Implement folder selection support in `renderTreeNode`.
+- [x] Refactor `createNewArticle` to use tree selection for destination.
+- [x] Refactor `moveArticle` to use tree selection.
+- [x] Refactor `moveFolderPrompt` to use tree selection.
+- [x] Implement cycle validation for folder moves (prevent moving into self/descendants).
+- [x] Fix `web_editor.html` to use `cancelSelection()` for the selection popup.
 
 ## Migration
 - [x] Create feature branch `feature/migrate-help-system`.

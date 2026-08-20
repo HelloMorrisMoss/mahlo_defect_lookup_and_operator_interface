@@ -1,8 +1,9 @@
 # Feature Specification: Defects App
 
-**Feature Branch**: `n/a` (migrated)
+**Feature Branch**: `track-used-defect-records-table`
 **Created**: 2026-08-05
-**Status**: migrated
+**Status**: Refined
+**Refined**: 2026-08-20 — Added requirements for defect request source attribution when querying the popup server.
 
 ## Description
 
@@ -16,6 +17,8 @@ A Dash-based dashboard for looking up and visualizing production defects within 
    identify patterns or specific problematic lots.
 3. **Active Row Highlighting**: As a user, I want the currently selected row to be clearly highlighted so I don't lose
    track of which record I am examining.
+4. **Defect Request Attribution**: As a system administrator, I want requesting systems to identify themselves as the source when requesting defect
+   records from the central server so that data access can be audited.
 
 ## Technical Requirements
 
@@ -31,12 +34,14 @@ A Dash-based dashboard for looking up and visualizing production defects within 
 ### Database Schema (SQLAlchemy)
 
 - Queries defect data via `app.connections.get_defects`.
+- **API-001**: MUST pass `source=mahlo_defect_lookup_table` when calling the central defect query endpoint.
 
 ## Success Criteria
 
 - [x] Date picker correctly triggers table updates.
 - [x] Table columns dynamically adjust based on database results.
 - [x] Active rows and cells are highlighted using conditional styling.
+- [ ] 100% of defect requests from the lookup table are correctly attributed to `mahlo_defect_lookup_table`.
 
 ## Assumptions
 

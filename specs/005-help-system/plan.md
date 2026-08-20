@@ -31,6 +31,9 @@
   - Interactive tree selection for block media paths and article links.
   - Non-modal popup for validation and confirmation.
   - Link block "Browse..." button renamed to "Select...".
+- **Tree-based Selection for Destinations (New)**:
+  - Use tree selection for destination folders when creating articles or moving content/folders.
+  - Cycle validation for folder moves (prevent moving into self/descendants).
 
 ## Data Strategy
 
@@ -81,3 +84,11 @@
 - [x] Replace modal media selector with tree-integrated workflow.
 - [x] Refactor link block article selection to use tree-integrated workflow.
 - [x] Update link block UI text to "Select...".
+
+### Phase 6: Destination Selection Refinement (2026-08-18)
+
+- [x] Generalize tree selection state in `web_editor.js`.
+- [x] Implement folder selection support in `renderTreeNode`.
+- [x] Refactor `createNewArticle` to use tree selection for destination.
+- [x] Refactor `moveArticle` and `moveFolderPrompt` to use tree selection.
+- [x] Implement cycle validation for folder moves.

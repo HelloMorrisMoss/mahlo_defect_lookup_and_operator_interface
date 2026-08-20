@@ -1,3 +1,5 @@
+**Propagated**: 2026-08-20 — Updated to include defect request attribution when querying mahlo_popup.
+
 # Implementation Plan: Defects App
 
 **Feature**: Defects App
@@ -36,6 +38,9 @@
 
 - Registered the feature as a Dash page in `app/pages/defects.py`.
 - Hooked callbacks into the main app factory in `app/__init__.py`.
+
+### Phase 5: Usage Tracking & Attribution
+- Update `get_defects` in `app/connections.py` to pass `source='mahlo_defect_lookup_table'`.
 
 ## Complexity Assessment
 

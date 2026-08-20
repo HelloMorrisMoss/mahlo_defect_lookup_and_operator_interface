@@ -60,15 +60,14 @@ The Help System provides a centralized management hub for creating, editing, and
     color as selection).
   - An on-hover close button on the media preview returns the pane to full-height article preview.
   - Selecting a different image/video updates the bottom preview and the border highlight.
-- **Tree-based Media & Link Selection**:
-  - Replace modal media and article selection with a non-modal popup that prompts the user to select the file/article on
-    the existing navigation tree.
-  - Real-time validation: Ensure the selection matches the block type (image for image blocks, video for video blocks,
-    article for link blocks).
-  - Link block button text changed from "Browse..." to "Select...".
-  - Show the path and an "OK" button in the popup when a valid selection is made.
-  - Display error messages in the popup for invalid selections; clear errors on new selection or when re-opening the
-    popup.
+- **Tree-based Selection for Destinations**:
+  - Use the 'select in tree' functionality for selecting destination folders when:
+    - Creating a new article (Enter section).
+    - Moving an article ('Move Article').
+    - Moving a folder ('Move Folder' from Folder Options).
+  - Validation: Ensure the selection for these actions is a folder.
+  - Validation for 'Move Folder': Prevent moving a folder into itself or its subfolders.
+  - The selection popup should display appropriate titles and messages for each context.
 
 ## Success Criteria
 
@@ -91,6 +90,9 @@ The Help System provides a centralized management hub for creating, editing, and
 - [x] Media selection for editor blocks uses the tree navigation with validation.
 - [x] Article selection for link blocks uses the tree navigation.
 - [x] Link block button text is updated to "Select...".
+- [x] Destination folder selection for new articles uses the tree navigation.
+- [x] Destination folder selection for moving articles uses the tree navigation.
+- [x] Destination folder selection for moving folders uses the tree navigation with cycle validation.
 
 ## History Note
 This feature's implementation history was migrated from the `mahlo_popup` repository.

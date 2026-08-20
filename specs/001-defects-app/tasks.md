@@ -1,3 +1,5 @@
+**Propagated**: 2026-08-20 — Added task for defect request attribution.
+
 # Tasks: Defects App
 
 **Feature**: Defects App
@@ -12,9 +14,12 @@
 
 ### [Story] Interactive Logic
 
-- [x] Implement `update_table` callback for date range filtering | `app/defects_app/callbacks.py`
-- [x] Implement `update_selected_row_color` for active row highlighting | `app/defects_app/callbacks.py`
+- [x] Implement `update_table` callback for date range filtering | `app/pages/defects.py`
+- [x] Implement `update_selected_row_color` for active row highlighting | `app/pages/defects.py`
 - [x] Register page route `/defects` | `app/pages/defects.py`
+
+### [Story] Usage Tracking
+- [ ] T001 Update `get_defects` to include `source` parameter in requests | `app/connections.py`
 
 ## Verification Tasks
 
