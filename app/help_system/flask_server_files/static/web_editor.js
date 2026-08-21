@@ -3,9 +3,11 @@ let currentArticleData = [];
 let previousArticlePath = null;
 let expandedFolders = new Set(["Root"]); // Root expanded by default
 let previewedMediaPath = null;
-let isSelectingForBlock = false;
+let isSelectingInTree = false;
+let selectionPurpose = ''; // 'BLOCK_MEDIA', 'BLOCK_LINK', 'CREATE_ARTICLE', 'MOVE_ARTICLE', 'MOVE_FOLDER'
 let selectionBlockIndex = -1;
-let selectionType = ''; // 'image', 'video', or 'article'
+let selectionType = ''; // 'image', 'video', 'article', 'folder'
+let selectionExtraData = null;
 
 async function refreshArticleList() {
     const response = await fetch('api/structure');
@@ -48,6 +50,10 @@ function renderTreeNode(node) {
             if (e.target.classList.contains('folder-edit-icon')) {
                 showFolderOptions(node);
                 return;
+            }
+
+            if (isSelectingInTree && selectionType === 'folder') {
+                handleSelectionClick(node, header);
             }
 
             toggleFolder(node.path);
@@ -103,7 +109,7 @@ function toggleFolder(path) {
 }
 
 function handleTreeItemClick(node, element) {
-    if (isSelectingForBlock) {
+    if (isSelectingInTree) {
         handleSelectionClick(node, element);
         return;
     }
@@ -145,7 +151,8 @@ function closeMediaPreview() {
 
 function showMediaSelectorForBlock(blockIndex) {
     const block = currentArticleData[blockIndex];
-    isSelectingForBlock = true;
+    isSelectingInTree = true;
+    selectionPurpose = 'BLOCK_MEDIA';
     selectionBlockIndex = blockIndex;
     selectionType = block.type; // 'image' or 'video'
 
@@ -165,7 +172,8 @@ function showMediaSelectorForBlock(blockIndex) {
 }
 
 function showLinkSelectorForBlock(blockIndex) {
-    isSelectingForBlock = true;
+    isSelectingInTree = true;
+    selectionPurpose = 'BLOCK_LINK';
     selectionBlockIndex = blockIndex;
     selectionType = 'article';
 
@@ -190,11 +198,23 @@ function handleSelectionClick(node, element) {
     const okBtn = document.getElementById('selection-ok-btn');
 
     if (node.type !== selectionType) {
-        error.textContent = `Must be an ${selectionType}. Selected: ${node.type}`;
+        error.textContent = `Must be a ${selectionType}. Selected: ${node.type}`;
         error.style.display = 'block';
         pathDisplay.textContent = 'Invalid selection';
         okBtn.style.display = 'none';
         return;
+    }
+
+    // Validation for MOVE_FOLDER: cannot move into self or child
+    if (selectionPurpose === 'MOVE_FOLDER') {
+        const sourcePath = selectionExtraData;
+        if (node.path === sourcePath || node.path.startsWith(sourcePath + '/')) {
+            error.textContent = "Cannot move a folder into itself or its subfolders.";
+            error.style.display = 'block';
+            pathDisplay.textContent = 'Invalid selection';
+            okBtn.style.display = 'none';
+            return;
+        }
     }
 
     error.style.display = 'none';
@@ -209,20 +229,30 @@ function handleSelectionClick(node, element) {
 }
 
 function confirmSelection(path) {
-    if (selectionType === 'article') {
+    if (selectionPurpose === 'BLOCK_LINK') {
         currentArticleData[selectionBlockIndex].target = getDisplayPath(path);
-    } else {
+        renderEditor();
+        renderPreview();
+    } else if (selectionPurpose === 'BLOCK_MEDIA') {
         currentArticleData[selectionBlockIndex].content = path;
+        renderEditor();
+        renderPreview();
+    } else if (selectionPurpose === 'CREATE_ARTICLE') {
+        executeCreateArticle(selectionExtraData, path);
+    } else if (selectionPurpose === 'MOVE_ARTICLE') {
+        confirmMoveArticle(path);
+    } else if (selectionPurpose === 'MOVE_FOLDER') {
+        confirmMoveFolder(selectionExtraData, path);
     }
     cancelSelection();
-    renderEditor();
-    renderPreview();
 }
 
 function cancelSelection() {
-    isSelectingForBlock = false;
+    isSelectingInTree = false;
+    selectionPurpose = '';
     selectionBlockIndex = -1;
     selectionType = '';
+    selectionExtraData = null;
     document.getElementById('selection-popup').style.display = 'none';
 }
 
@@ -586,28 +616,26 @@ function showFolderOptions(folder) {
 }
 
 async function moveFolderPrompt(path) {
-    // Scan structure to get folders
-    const response = await fetch('api/structure');
-    const tree = await response.json();
+    hideModal();
 
-    let folders = [];
+    isSelectingInTree = true;
+    selectionPurpose = 'MOVE_FOLDER';
+    selectionType = 'folder';
+    selectionExtraData = path; // The folder we are moving
 
-    function collectFolders(node) {
-        if (node.type === 'folder' && !node.is_media && node.path !== path && !node.path.startsWith(path + '/')) {
-            folders.push(node);
-            node.children.forEach(collectFolders);
-        }
-    }
+    const popup = document.getElementById('selection-popup');
+    const title = document.getElementById('selection-popup-title');
+    const msg = document.getElementById('selection-popup-message');
+    const error = document.getElementById('selection-error');
+    const pathDisplay = document.getElementById('selection-path-display');
+    const okBtn = document.getElementById('selection-ok-btn');
 
-    collectFolders(tree);
-
-    let body = '<p>Select target parent folder:</p><div style="max-height: 400px; overflow-y: auto;">';
-    folders.forEach(f => {
-        body += `<div class="article-item" onclick="confirmMoveFolder(${esc(path)}, ${esc(f.path)})">${f.name} (${f.path})</div>`;
-    });
-    body += '</div>';
-
-    showModal('Move Folder', body);
+    title.textContent = 'Move Folder';
+    msg.textContent = 'Select target parent folder in the tree.';
+    error.style.display = 'none';
+    pathDisplay.textContent = 'No folder selected';
+    okBtn.style.display = 'none';
+    popup.style.display = 'block';
 }
 
 async function confirmMoveFolder(oldPath, newParentPath) {
@@ -681,28 +709,23 @@ async function createNewFolderPrompt(parentPath) {
 async function moveArticle() {
     if (!currentArticlePath) return;
 
-    // Scan structure to get folders
-    const response = await fetch('api/structure');
-    const tree = await response.json();
+    isSelectingInTree = true;
+    selectionPurpose = 'MOVE_ARTICLE';
+    selectionType = 'folder';
 
-    let folders = [];
+    const popup = document.getElementById('selection-popup');
+    const title = document.getElementById('selection-popup-title');
+    const msg = document.getElementById('selection-popup-message');
+    const error = document.getElementById('selection-error');
+    const pathDisplay = document.getElementById('selection-path-display');
+    const okBtn = document.getElementById('selection-ok-btn');
 
-    function collectFolders(node) {
-        if (node.type === 'folder' && !node.is_media) {
-            folders.push(node);
-            node.children.forEach(collectFolders);
-        }
-    }
-
-    collectFolders(tree);
-
-    let body = '<p>Select target folder:</p><div style="max-height: 400px; overflow-y: auto;">';
-    folders.forEach(f => {
-        body += `<div class="article-item" onclick="confirmMoveArticle(${esc(f.path)})">${f.name} (${f.path})</div>`;
-    });
-    body += '</div>';
-
-    showModal('Move Article', body);
+    title.textContent = 'Move Article';
+    msg.textContent = 'Select target destination folder in the tree.';
+    error.style.display = 'none';
+    pathDisplay.textContent = 'No folder selected';
+    okBtn.style.display = 'none';
+    popup.style.display = 'block';
 }
 
 async function confirmMoveArticle(newParentPath) {
@@ -804,8 +827,28 @@ async function createNewArticle() {
     const title = prompt("Enter article title:");
     if (!title) return;
 
-    const section = prompt("Enter section (optional, e.g. 'CategoryName'):", "");
+    isSelectingInTree = true;
+    selectionPurpose = 'CREATE_ARTICLE';
+    selectionType = 'folder';
+    selectionExtraData = title;
 
+    const popup = document.getElementById('selection-popup');
+    const titleEl = document.getElementById('selection-popup-title');
+    const msg = document.getElementById('selection-popup-message');
+    const error = document.getElementById('selection-error');
+    const pathDisplay = document.getElementById('selection-path-display');
+    const okBtn = document.getElementById('selection-ok-btn');
+
+    titleEl.textContent = 'New Article: ' + title;
+    msg.textContent = 'Select destination folder in the tree.';
+    error.style.display = 'none';
+    pathDisplay.textContent = 'No folder selected';
+    okBtn.style.display = 'none';
+    popup.style.display = 'block';
+}
+
+async function executeCreateArticle(title, sectionPath) {
+    const section = getDisplayPath(sectionPath);
     try {
         const response = await fetch('api/create_article', {
             method: 'POST',

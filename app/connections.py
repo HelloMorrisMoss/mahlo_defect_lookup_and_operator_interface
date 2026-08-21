@@ -18,6 +18,7 @@ def get_defects(start_date: datetime = None, end_date: datetime = None) -> pd.Da
         data = {
             'start_date': start_date.isoformat() if not isinstance(start_date, str) else start_date,
             'end_date': end_date.isoformat() if not isinstance(end_date, str) else end_date,
+            'source': 'mahlo_defect_lookup_table',
             }
         response = requests.get(defects_list_address, json=data, timeout=20)
         response_dict = response.json()

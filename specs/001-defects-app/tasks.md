@@ -19,7 +19,7 @@
 - [x] Register page route `/defects` | `app/pages/defects.py`
 
 ### [Story] Usage Tracking
-- [ ] T001 Update `get_defects` to include `source` parameter in requests | `app/connections.py`
+- [x] T001 Update `get_defects` to include `source` parameter in requests | `app/connections.py`
 
 ## Verification Tasks
 
