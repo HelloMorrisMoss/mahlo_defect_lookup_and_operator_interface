@@ -13,7 +13,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 80%;
             margin: 0 auto;
             background: white;
             padding: 20px;
@@ -209,11 +209,13 @@
     <table id="version-table">
         <thead>
         <tr>
+            <th>ID</th>
             <th>Timestamp</th>
-            <th>Comment</th>
+            <th style="width: 40em;">Comment</th>
+            <th>Parent</th>
             <th>Manifest Hash</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th style="width: 18em;">Actions</th>
         </tr>
         </thead>
         <tbody id="version-list">
@@ -256,6 +258,10 @@
 </div>
 
 <script>
+    let checkedOutVersionId = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    checkedOutVersionId = urlParams.get('checked_out');
+
     async function loadVersions() {
         const response = await fetch('api/versions/history');
         const versions = await response.json();
@@ -265,13 +271,16 @@
         versions.forEach(v => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                    <td>${v.id}</td>
                     <td>${new Date(v.timestamp).toLocaleString()}</td>
                     <td>${v.comment || '<i>No comment</i>'}</td>
+                    <td>${v.parent_id || '-'}</td>
                     <td class="manifest-hash">${v.manifest_hash.substring(0, 12)}...</td>
                     <td class="${v.is_published ? 'published' : ''}">${v.is_published ? 'Published' : 'Draft'}</td>
                     <td>
                         ${v.is_published ? '' : `<button class="publish" onclick="publishVersion(${v.id})">Publish</button>`}
                         <button class="secondary" onclick="viewDiff(${v.id})">Inspect</button>
+                        <button class="checkout" onclick="checkoutVersion(${v.id})" style="background: #e8a317;">Check Out</button>
                     </td>
                 `;
             list.appendChild(tr);
@@ -291,7 +300,7 @@
         const response = await fetch('api/versions/create', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({comment})
+            body: JSON.stringify({comment, parent_id: checkedOutVersionId})
         });
         if (response.ok) {
             hideModal();
@@ -423,6 +432,22 @@
     function hideFileDiff() {
         document.getElementById('diff-changes-list').style.display = 'block';
         document.getElementById('file-diff-view').style.display = 'none';
+    }
+
+    async function checkoutVersion(id) {
+        if (!confirm(`Are you sure you want to check out version ${id}? This will overwrite your current draft content.`)) return;
+        const response = await fetch('api/versions/checkout', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id})
+        });
+        if (response.ok) {
+            alert('Version checked out successfully. Redirecting to editor...');
+            window.location.href = '{{ url_for("help_system.web_editor") }}?checked_out=' + id;
+        } else {
+            const data = await response.json();
+            alert('Failed to check out version: ' + (data.error || 'Unknown error'));
+        }
     }
 
     loadVersions();

@@ -81,3 +81,39 @@ class CASManager:
             f.write(manifest_data)
 
         return manifest_hash, manifest
+
+    def restore_from_manifest(self, manifest_hash: str):
+        """
+        Restores the content_dir from a given manifest hash.
+        Clears existing content (excluding blobs).
+        """
+        manifest_path = self.get_blob_path(manifest_hash)
+        if not os.path.exists(manifest_path):
+            raise FileNotFoundError(f"Manifest blob {manifest_hash} not found.")
+
+        with open(manifest_path, "r", encoding='utf-8') as f:
+            manifest = json.load(f)
+
+        # Clear current content (excluding blobs)
+        for item in os.listdir(self.content_dir):
+            if item == "blobs":
+                continue
+            item_path = os.path.join(self.content_dir, item)
+            if os.path.isdir(item_path):
+                shutil.rmtree(item_path)
+            else:
+                os.remove(item_path)
+
+        # Restore files from manifest
+        for rel_path, blob_hash in manifest["files"].items():
+            dest_path = os.path.join(self.content_dir, rel_path)
+            os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+            blob_path = self.get_blob_path(blob_hash)
+            if os.path.exists(blob_path):
+                shutil.copy2(blob_path, dest_path)
+            else:
+                # In a real CAS, we might want to fail here, but for now we warn
+                print(f"Warning: Blob {blob_hash} for {rel_path} not found.")
+
+        # Restore manifest.json itself
+        shutil.copy2(manifest_path, os.path.join(self.content_dir, "manifest.json"))

@@ -1,5 +1,6 @@
 # Plan: Help System Migration & Integration
 
+**Propagated: 2026-08-31 — Updated from spec.md refinement**
 **Refined: 2026-08-31 — Video Comparison in Versioning**
 **Refined: 2026-08-18 — UI/UX Polish & Link Selection Refactor**
 
@@ -11,6 +12,10 @@
 - **Backend**:
   - `routes.py`: Controller logic for APIs and view rendering.
   - `CASManager`: Service for file-level versioning and deduplication.
+  - **Version Checkout Strategy**:
+    - Loading a specific version hash into the editor session.
+    - Tracking the parent version ID in the `ContentVersion` record.
+    - Restricting direct saves to checked-out versions; requiring "Save as New".
   - `ContentVersion` & `BlobMetadata`: Database models for tracking state.
 
 ## UI/UX Enhancements (Refined 2026-08-18)
@@ -102,3 +107,11 @@
 
 - [x] Implement visual video comparison in `versioning.html`.
 - [x] Add CSS styling for video elements in diff view.
+
+### Phase 8: Version Checkout & Parent Tracking (Completed 2026-08-31)
+
+- [x] Add `parent_id` column to `ContentVersion` model.
+- [x] Implement checkout logic in `CASManager`.
+- [x] Update `versioning.html` to show parent versions and checkout actions.
+- [x] Update `web_editor.js` to handle checked-out state and "Save as New" workflow.
+- [x] Provide migration script for `parent_id` population.

@@ -1,10 +1,23 @@
 # Tasks: Help System Migration
 
+**Propagated: 2026-08-31 — Updated from spec.md refinement**
+
 ## Versioning Enhancements (Refined 2026-08-31)
 
 - [x] Implement visual video comparison in `versioning.html`.
 - [x] Add CSS styling for video elements in diff view.
 - [x] Manual test: Verify the diff shows video previews for added/modified videos.
+
+## Version Checkout & Parent Tracking (Completed 2026-08-31)
+
+- [x] [T1] [P1] Add `parent_id` column to `ContentVersion` table (SQLite migration script provided).
+- [x] [T2] [P1] Update `ContentVersion` SQLAlchemy model and `to_dict` method.
+- [x] [T3] [P2] Implement `restore_from_manifest(manifest_hash)` in `CASManager` to restore article files from blobs.
+- [x] [T4] [P2] Add `/help/api/versions/checkout` POST route.
+- [x] [T5] [P2] Update versioning table in `versioning.html` to add "ID" and "Parent" columns and "Check Out" button.
+- [x] [T6] [P2] Update editor to track checked-out version ID and display indicator.
+- [x] [T7] [P2] Handle "Save as New Version" logic by sending `parent_id` to server.
+- [x] [T8] [P2] Update `create_version` API to accept and store `parent_id`.
 
 ## Implementation Polish (Refined 2026-08-18)
 

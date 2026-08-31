@@ -181,9 +181,14 @@ def get_version_history():
 def create_version():
     data = request.json
     comment = data.get('comment', '')
+    parent_id = data.get('parent_id')
     cas_manager = get_cas_manager()
     manifest_hash, manifest = cas_manager.create_manifest()
-    new_version = ContentVersion(comment=comment, manifest_hash=manifest_hash)
+    new_version = ContentVersion(
+        comment=comment,
+        manifest_hash=manifest_hash,
+        parent_id=parent_id
+    )
     db.session.add(new_version)
     db.session.commit()
     return jsonify(new_version.to_dict())
@@ -200,6 +205,22 @@ def publish_version():
         db.session.commit()
         return jsonify(version.to_dict())
     return jsonify({"error": "Version not found"}), 404
+
+
+@help_system_bp.route('/api/versions/checkout', methods=['POST'])
+@login_required
+def checkout_version():
+    data = request.json
+    version_id = data.get('id')
+    version = db.session.get(ContentVersion, version_id)
+    if not version:
+        return jsonify({"error": "Version not found"}), 404
+    cas_manager = get_cas_manager()
+    try:
+        cas_manager.restore_from_manifest(version.manifest_hash)
+        return jsonify({"success": True, "message": f"Version {version_id} checked out."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @help_system_bp.route('/api/versions/diff/<int:version_id>')
 @login_required

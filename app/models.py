@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
@@ -39,6 +40,7 @@ class ContentVersion(db.Model):
     comment = db.Column(db.String(500))
     manifest_hash = db.Column(db.String(64), nullable=False)  # SHA-256 hash of the manifest file
     is_published = db.Column(db.Boolean, default=False, index=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('content_versions.id'), nullable=True)
 
     def to_dict(self):
         return {
@@ -46,7 +48,8 @@ class ContentVersion(db.Model):
             "timestamp": self.timestamp.isoformat(),
             "comment": self.comment,
             "manifest_hash": self.manifest_hash,
-            "is_published": self.is_published
+            "is_published": self.is_published,
+            "parent_id": self.parent_id
         }
 
 

@@ -1,6 +1,7 @@
 # Spec: Help System (Editor & Versioning)
 
-**Status**: Refined: 2026-08-31 — Added video comparison to versioning diff view.
+**Status**: Refined: 2026-08-31 — Added version checkout, edit-as-new, and parent version tracking.
+**Refined**: 2026-08-31 — Added version checkout, edit-as-new, and parent version tracking.
 **Refined**: 2026-08-31 — Added video comparison to versioning diff view.
 **Refined**: 2026-08-18 — Refactored link selection to use tree-based workflow.
 **Refined**: 2026-08-18 — UI/UX polish for editor and tree view.
@@ -16,6 +17,8 @@ The Help System provides a centralized management hub for creating, editing, and
   organized by the article's top-level category folder.
 - **Admin versions content**: As an admin, I want to create snapshots of the entire help system (versions) and decide which version is "Published" for external subscribers.
 - **Admin reviews changes**: As an admin, I want to see a diff of changes between the current draft and previous versions before publishing.
+- **Admin checks out a version**: As an admin, I want to check out a previous version of the help content so that I can
+  view it in the editor and use it as a base for a new version.
 - **Admin customizes article icons**: As an admin, I want to set a custom unicode icon for specific articles to make
   them stand out in the list.
 - **Admin navigates content efficiently**: As an admin, I want to expand/collapse folders by clicking their names, and
@@ -74,6 +77,12 @@ The Help System provides a centralized management hub for creating, editing, and
   - Validation: Ensure the selection for these actions is a folder.
   - Validation for 'Move Folder': Prevent moving a folder into itself or its subfolders.
   - The selection popup should display appropriate titles and messages for each context.
+- **Version Checkout & Parent Tracking**:
+  - Users can "check out" any version from the versioning history. This loads that version's content into the editor.
+  - When editing a checked-out version, users can save changes as a new version.
+  - The system tracks the `parent_id` for each version to show its lineage.
+  - The versioning history table includes a "Parent" column.
+  - Diffs are still calculated against the previously saved version (or current draft) to maintain simplicity.
 
 ## Success Criteria
 
@@ -100,6 +109,11 @@ The Help System provides a centralized management hub for creating, editing, and
 - [x] Destination folder selection for new articles uses the tree navigation.
 - [x] Destination folder selection for moving articles uses the tree navigation.
 - [x] Destination folder selection for moving folders uses the tree navigation with cycle validation.
+- [ ] Admin can check out a specific version from history.
+- [ ] Checked out version is loaded into the editor for viewing/editing.
+- [ ] Admin can save changes from a checked-out version as a new version.
+- [ ] The new version correctly records its parent version.
+- [ ] The versioning history table displays the parent version for each entry.
 
 ## History Note
 This feature's implementation history was migrated from the `mahlo_popup` repository.

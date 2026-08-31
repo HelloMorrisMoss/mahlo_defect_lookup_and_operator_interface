@@ -478,10 +478,15 @@
         <div style="display: flex; gap: 5px;">
             <button onclick="refreshArticleList()">Refresh</button>
             <button class="primary" onclick="createNewArticle()">New</button>
-            <button id="publishing-btn" onclick="window.location.href='{{ url_for('help_system.versioning_page') }}'">
+            <button id="publishing-btn" onclick="goToPublishing()">
                 Publishing
             </button>
         </div>
+    </div>
+    <div id="checkout-indicator"
+         style="display: none; background: #fff4ce; padding: 5px 10px; font-size: 12px; border-bottom: 1px solid var(--border-color); align-items: center; justify-content: space-between;">
+        <span>Checked out: <strong id="checked-out-version-id"></strong></span>
+        <button onclick="clearCheckout()" style="padding: 2px 5px; font-size: 10px;">Clear</button>
     </div>
     <div id="article-list">
         <!-- Loaded via JS -->
@@ -541,6 +546,10 @@
     </div>
 </div>
 
+<script>
+    const VERSIONING_PAGE_URL = "{{ url_for('help_system.versioning_page') }}";
+    const EDITOR_PAGE_URL = "{{ url_for('help_system.web_editor') }}";
+</script>
 <script src="{{ url_for('help_system.static', filename='web_editor.js') }}"></script>
 </body>
 </html>

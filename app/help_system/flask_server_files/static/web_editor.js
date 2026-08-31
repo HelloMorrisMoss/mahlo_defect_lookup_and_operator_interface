@@ -8,6 +8,7 @@ let selectionPurpose = ''; // 'BLOCK_MEDIA', 'BLOCK_LINK', 'CREATE_ARTICLE', 'MO
 let selectionBlockIndex = -1;
 let selectionType = ''; // 'image', 'video', 'article', 'folder'
 let selectionExtraData = null;
+let checkedOutVersionId = null;
 
 async function refreshArticleList() {
     const response = await fetch('api/structure');
@@ -873,7 +874,29 @@ async function executeCreateArticle(title, sectionPath) {
 
 // Initial load
 async function init() {
+    const urlParams = new URLSearchParams(window.location.search);
+    checkedOutVersionId = urlParams.get('checked_out');
+
+    if (checkedOutVersionId) {
+        document.getElementById('checkout-indicator').style.display = 'flex';
+        document.getElementById('checked-out-version-id').textContent = 'Version ' + checkedOutVersionId;
+    }
+
     await refreshArticleList();
+}
+
+function clearCheckout() {
+    if (confirm("Clear checked-out version state? You will remain on the current draft content.")) {
+        window.location.href = EDITOR_PAGE_URL;
+    }
+}
+
+function goToPublishing() {
+    let url = VERSIONING_PAGE_URL;
+    if (checkedOutVersionId) {
+        url += '?checked_out=' + checkedOutVersionId;
+    }
+    window.location.href = url;
 }
 
 init();
