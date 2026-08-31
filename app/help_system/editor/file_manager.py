@@ -201,7 +201,7 @@ def move_resource(project_root: str, old_abs_path: str, new_parent_dir: str):
 def consolidate_article_media(project_root: str, article_path: str, data: List[Dict]) -> (List[Dict], bool):
     """
     Ensures all media referenced in the article data is stored in the 
-    article's designated category-specific media folder.
+    article's designated top-level category media folder.
     Returns (updated_data, changed_flag).
     """
     changed = False

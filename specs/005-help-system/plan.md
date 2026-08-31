@@ -46,6 +46,7 @@
   - JSON-based help articles and binary blobs are stored in `app/help_system/help_content/`.
   - All paths in articles (images, videos, links) are normalized to be relative to the `help_content/` root.
   - Legacy prefixes like `help_window/help_content/` are stripped during migration and enforced for new content.
+  - Media files are organized by the article's top-level category folder (e.g., `help_content/Category/media/`).
 - **Media Serving**:
   - Media is served via the `/help/media/<path>` route, which maps directly to the `help_content/` directory.
   - This allows the editor preview to show "draft" content accurately.

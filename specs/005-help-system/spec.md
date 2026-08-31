@@ -10,7 +10,8 @@ The Help System provides a centralized management hub for creating, editing, and
 
 ## User Scenarios
 - **Admin edits help articles**: As an admin, I want to use a web-based WYSIWYG editor to manage help content without writing JSON manually.
-- **Admin manages media**: As an admin, I want to upload images and videos directly through the editor and have them organized by article category.
+- **Admin manages media**: As an admin, I want to upload images and videos directly through the editor and have them
+  organized by the article's top-level category folder.
 - **Admin versions content**: As an admin, I want to create snapshots of the entire help system (versions) and decide which version is "Published" for external subscribers.
 - **Admin reviews changes**: As an admin, I want to see a diff of changes between the current draft and previous versions before publishing.
 - **Admin customizes article icons**: As an admin, I want to set a custom unicode icon for specific articles to make
@@ -30,6 +31,9 @@ The Help System provides a centralized management hub for creating, editing, and
   directory to ensure deduplication and integrity.
 - **Path Normalization**: All internal article references and manifest entries must use paths relative to the
   `help_content/` root, stripping legacy repository prefixes.
+- **Media Organization**: Media files (images and videos) uploaded for an article are stored in a `media/`
+  directory within the article's top-level category folder (e.g., `help_content/01 - Category/media/`).
+  This ensures media is shared across articles within the same primary category.
 - **Blueprint Isolation**: The help system logic must be isolated in a Flask Blueprint mounted at `/help` to avoid
   interference with Dash components.
 - **Navigation Integration**: The editor must be reachable via the main application navigation menu.
