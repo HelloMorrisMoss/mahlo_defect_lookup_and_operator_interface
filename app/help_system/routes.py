@@ -8,6 +8,7 @@ from flask_login import login_required
 from app.help_system import help_system_bp
 from app.help_system.editor.file_manager import upload_media, delete_resource, rename_resource, move_resource, \
     consolidate_article_media
+from app.help_system.utils.article_processor import ensure_article_integrity
 from app.help_system.utils.cas_manager import CASManager
 from app.models import ContentVersion, db
 
@@ -158,6 +159,11 @@ def save_article():
     data = request.json
     path = data.get('path')
     content = data.get('content')
+
+    # Enforce structural integrity (HLP-021)
+    title = os.path.basename(path).replace(".json", "")
+    content = ensure_article_integrity(content, title)
+    
     abs_path = to_abs(path)
     os.makedirs(os.path.dirname(abs_path), exist_ok=True)
     with open(abs_path, 'w', encoding='utf-8') as f:
