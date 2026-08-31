@@ -1,6 +1,8 @@
 # Spec: Help System (Editor & Versioning)
 
-**Status**: Refined: 2026-08-18 — Refactored link selection to use tree-based workflow.
+**Status**: Refined: 2026-08-31 — Added video comparison to versioning diff view.
+**Refined**: 2026-08-31 — Added video comparison to versioning diff view.
+**Refined**: 2026-08-18 — Refactored link selection to use tree-based workflow.
 **Refined**: 2026-08-18 — UI/UX polish for editor and tree view.
 **Refined**: 2026-08-18 — Added Media Preview and Tree-based Media Selection functionality.
 **Refined**: 2026-08-18 — Refactored Link block to use tree-based selection and renamed "Browse..." to "Select...".
@@ -80,6 +82,7 @@ The Help System provides a centralized management hub for creating, editing, and
 - [x] Media can be uploaded and correctly referenced in articles.
 - [x] Versions can be created, viewed in history, and published.
 - [x] Diffs correctly identify added, modified, and removed files between versions.
+- [x] Media (images and videos) can be visually compared/previewed in the versioning diff view.
 - [x] Articles display "ℹ️" by default in the tree view.
 - [x] Images display "📷" in the tree view.
 - [x] Videos display "🎥" in the tree view.

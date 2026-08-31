@@ -1,5 +1,11 @@
 # Tasks: Help System Migration
 
+## Versioning Enhancements (Refined 2026-08-31)
+
+- [x] Implement visual video comparison in `versioning.html`.
+- [x] Add CSS styling for video elements in diff view.
+- [x] Manual test: Verify the diff shows video previews for added/modified videos.
+
 ## Implementation Polish (Refined 2026-08-18)
 
 - [x] Default article icon changed to "ℹ️".

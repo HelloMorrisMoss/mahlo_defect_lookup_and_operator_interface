@@ -176,7 +176,7 @@
             border: 1px solid #ddd;
         }
 
-        .image-diff-item img {
+        .image-diff-item img, .image-diff-item video {
             max-width: 100%;
             height: auto;
             border: 1px solid #eee;
@@ -368,10 +368,24 @@
                 span.innerText = line;
                 diffContent.appendChild(span);
             });
-        } else if (path.match(/\.(png|jpg|jpeg|gif|svg)$/i)) {
+        } else if (path.match(/\.(png|jpg|jpeg|gif|svg|bmp|webp|mp4|webm|ogg|mov|avi)$/i)) {
             diffContent.style.fontFamily = 'inherit';
             diffContent.style.whiteSpace = 'normal';
             diffContent.style.background = 'transparent';
+
+            const isVideo = path.match(/\.(mp4|webm|ogg|mov|avi)$/i);
+            const createMediaElement = (hash) => {
+                if (isVideo) {
+                    const video = document.createElement('video');
+                    video.src = `api/blob/${hash}`;
+                    video.controls = true;
+                    return video;
+                } else {
+                    const img = document.createElement('img');
+                    img.src = `api/blob/${hash}`;
+                    return img;
+                }
+            };
 
             if (oldHash && newHash && oldHash !== newHash) {
                 const container = document.createElement('div');
@@ -379,29 +393,24 @@
 
                 const oldItem = document.createElement('div');
                 oldItem.className = 'image-diff-item';
-                oldItem.innerHTML = '<span class="image-diff-label">Previous</span>';
-                const oldImg = document.createElement('img');
-                oldImg.src = `api/blob/${oldHash}`;
-                oldItem.appendChild(oldImg);
+                oldItem.innerHTML = `<span class="image-diff-label">Previous ${isVideo ? 'Video' : 'Image'}</span>`;
+                oldItem.appendChild(createMediaElement(oldHash));
 
                 const newItem = document.createElement('div');
                 newItem.className = 'image-diff-item';
-                newItem.innerHTML = '<span class="image-diff-label">Current</span>';
-                const newImg = document.createElement('img');
-                newImg.src = `api/blob/${newHash}`;
-                newItem.appendChild(newImg);
+                newItem.innerHTML = `<span class="image-diff-label">Current ${isVideo ? 'Video' : 'Image'}</span>`;
+                newItem.appendChild(createMediaElement(newHash));
 
                 container.appendChild(oldItem);
                 container.appendChild(newItem);
                 diffContent.appendChild(container);
             } else {
-                const img = document.createElement('img');
-                img.src = `api/blob/${newHash || oldHash}`;
-                img.style.maxWidth = '100%';
-                img.style.display = 'block';
-                img.style.margin = '0 auto';
-                img.style.border = '1px solid #ddd';
-                diffContent.appendChild(img);
+                const media = createMediaElement(newHash || oldHash);
+                media.style.maxWidth = '100%';
+                media.style.display = 'block';
+                media.style.margin = '0 auto';
+                media.style.border = '1px solid #ddd';
+                diffContent.appendChild(media);
             }
         } else {
             diffContent.innerText = 'No diff available or binary file.';

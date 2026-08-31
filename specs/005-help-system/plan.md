@@ -1,5 +1,6 @@
 # Plan: Help System Migration & Integration
 
+**Refined: 2026-08-31 — Video Comparison in Versioning**
 **Refined: 2026-08-18 — UI/UX Polish & Link Selection Refactor**
 
 ## Architecture
@@ -27,6 +28,9 @@
   - Split-pane layout for image/video preview in the editor.
   - Border highlight for selected media in the tree.
   - Integrated close button for media preview.
+- **Video Comparison (New 2026-08-31)**:
+  - Visual side-by-side comparison for videos in the versioning diff view.
+  - Support for `mp4`, `webm`, `ogg`, `mov`, `avi` formats.
 - **Tree-based Media & Link Selection (Refined 2026-08-18)**:
   - Interactive tree selection for block media paths and article links.
   - Non-modal popup for validation and confirmation.
@@ -93,3 +97,8 @@
 - [x] Refactor `createNewArticle` to use tree selection for destination.
 - [x] Refactor `moveArticle` and `moveFolderPrompt` to use tree selection.
 - [x] Implement cycle validation for folder moves.
+
+### Phase 7: Versioning Enhancements (2026-08-31)
+
+- [x] Implement visual video comparison in `versioning.html`.
+- [x] Add CSS styling for video elements in diff view.
