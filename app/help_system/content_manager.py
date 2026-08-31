@@ -41,7 +41,10 @@ class ContentManager:
         # rel_path might be absolute, project-relative, or content-relative.
 
         # 1. Try using absolute paths to identify the prefix (works if CWD is correct)
-        abs_rel_path = os.path.abspath(os.path.join(os.getcwd(), path)).replace("\\", "/")
+        abs_rel_path = os.path.abspath(os.path.join(self.content_dir, "..", "..", "..", path)).replace("\\", "/")
+        if not os.path.exists(abs_rel_path):
+            abs_rel_path = os.path.abspath(os.path.join(os.getcwd(), path)).replace("\\", "/")
+        
         abs_content_dir = os.path.abspath(self.content_dir).replace("\\", "/")
 
         search_path = None
@@ -52,7 +55,8 @@ class ContentManager:
 
         # 2. If no match, try stripping the standard project-relative prefix (fallback for wrong CWD)
         if search_path is None:
-            for prefix in ["help_window/help_content/", "./help_window/help_content/"]:
+            for prefix in ["app/help_system/help_content/", "help_system/help_content/", "help_window/help_content/",
+                           "./help_window/help_content/"]:
                 if path.startswith(prefix):
                     search_path = path[len(prefix):]
                     break

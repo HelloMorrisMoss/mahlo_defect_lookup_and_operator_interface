@@ -418,7 +418,9 @@ function renderEditor() {
 
 function getDisplayPath(path) {
     if (!path) return "";
-    return path.replace('help_window/help_content/', '').replace('app/help_system/help_content/', '');
+    return path.replace('help_window/help_content/', '')
+        .replace('app/help_system/help_content/', '')
+        .replace('help_system/help_content/', '');
 }
 
 function renderPreview() {

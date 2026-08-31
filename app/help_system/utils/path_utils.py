@@ -14,9 +14,20 @@ def resolve_resource_path(file_path: str) -> str:
     if os.path.isabs(file_path) and os.path.isfile(file_path):
         return file_path
 
-    # Try relative to CWD (project root)
+    # Try relative to CWD
     abs_path = os.path.abspath(os.path.join(os.getcwd(), file_path))
     if os.path.isfile(abs_path):
         return abs_path
+
+    # Try relative to the 'app' directory if CWD is project root
+    app_rel_path = os.path.abspath(os.path.join(os.getcwd(), "app", file_path))
+    if os.path.isfile(app_rel_path):
+        return app_rel_path
+
+    # Try relative to help_system root
+    help_sys_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    help_sys_path = os.path.abspath(os.path.join(help_sys_root, file_path))
+    if os.path.isfile(help_sys_path):
+        return help_sys_path
 
     return file_path

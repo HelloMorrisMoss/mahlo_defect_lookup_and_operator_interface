@@ -75,7 +75,7 @@ def rename_resource(project_root: str, old_abs_path: str, new_name: str):
     if os.path.exists(new_abs_path):
         raise FileExistsError(f"Target path already exists: {new_abs_path}")
 
-    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
+    content_dir = os.path.join(project_root, "help_system", "help_content")
 
     # Calculate relative paths for reference updates (relative to help_content)
     try:
@@ -112,7 +112,7 @@ def get_media_dir(project_root: str, article_path: str) -> str:
     Help content is in project_root/app/help_system/help_content/.
     Returns the absolute path to the media directory.
     """
-    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
+    content_dir = os.path.join(project_root, "help_system", "help_content")
 
     if not article_path:
         media_dir = os.path.join(content_dir, "media")
@@ -159,7 +159,7 @@ def upload_media(project_root: str, article_path: str, source_file: str) -> str:
     if os.path.abspath(source_file) != os.path.abspath(dest_path):
         shutil.copy2(source_file, dest_path)
 
-    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
+    content_dir = os.path.join(project_root, "help_system", "help_content")
     rel_path = os.path.relpath(dest_path, content_dir).replace("\\", "/")
     return rel_path
 
@@ -179,7 +179,7 @@ def move_resource(project_root: str, old_abs_path: str, new_parent_dir: str):
     if os.path.exists(new_abs_path):
         raise FileExistsError(f"Target path already exists: {new_abs_path}")
 
-    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
+    content_dir = os.path.join(project_root, "help_system", "help_content")
 
     # Calculate relative paths for reference updates (relative to help_content)
     try:
@@ -206,7 +206,7 @@ def consolidate_article_media(project_root: str, article_path: str, data: List[D
     """
     changed = False
     new_data = []
-    content_dir = os.path.join(project_root, "app", "help_system", "help_content")
+    content_dir = os.path.join(project_root, "help_system", "help_content")
 
     for block in data:
         new_block = block.copy()
