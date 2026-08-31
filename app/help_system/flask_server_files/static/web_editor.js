@@ -514,6 +514,7 @@ async function consolidateMedia() {
         if (result.status === 'success') {
             if (result.changed) {
                 currentArticleData = result.content;
+                refreshArticleList();
                 renderEditor();
                 renderPreview();
                 alert("Media consolidated successfully.");
@@ -813,6 +814,7 @@ function triggerUpload(blockIndex) {
             const result = await response.json();
             if (result.status === 'success') {
                 currentArticleData[blockIndex].content = result.path;
+                refreshArticleList();
                 renderEditor();
                 renderPreview();
             } else {
